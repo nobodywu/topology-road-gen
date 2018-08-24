@@ -58,8 +58,8 @@ def main():
 
 
 if __name__ == '__main__':
-    KML_FILE = '/home/mengze/Desktop/fengtai_Aug20.kml'
-    TXT_FILE = '/home/mengze/Desktop/GPS_fengtai_Aug20.txt'
+    KML_FILE = '/home/mengze/Desktop/fengtai/rough_terrain/fengtai_Aug24.kml'
+    TXT_FILE = '/home/mengze/Desktop/fengtai/rough_terrain/fengtai_Aug24.txt'
     OUTPUT = True
     INTERVAL = 2
     POINT_ATTRIBUTE = [0, 1, 2, 3, 4]

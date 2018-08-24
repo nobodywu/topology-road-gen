@@ -160,6 +160,8 @@ def writeXML(points, way_id, NODE_ATTR, SET_VEL_LIMIT, limit_points, OTHER_ATTR,
     with open(file_name, 'w') as f:
         doc.writexml(f, addindent="    ", newl="\n", encoding="UTF-8")
 
+    print('Done!')
+
     return limit_points, other_attr_points
 
 
@@ -328,22 +330,31 @@ def showInspect(points_stack, all_seg, points_all, PAUSE):
             if first | last:
                 relevant_seg = np.vstack([relevant_seg, seg])
 
+        range_PCS = calcRange(relevant_seg)
+
+        set_xylim(range_PCS)
+        plt.pause(PAUSE)
         plt.scatter(relevant_seg[:, 0], relevant_seg[:, 1], c='g', marker='o')
         plt.scatter(points_stack[:, 0], points_stack[:, 1], c='k', marker='o')
         plt.pause(PAUSE * 2)
         plt.clf()
-        plt.axis('equal')
+        # plt.axis('equal')
+        set_xylim(range_PCS)
         plt.scatter(points_all[:, 0], points_all[:, 1], c='r', marker='o')
         plt.scatter(points_stack[:, 0], points_stack[:, 1], c='k', marker='o')
         plt.pause(PAUSE * 2)
 
 
-def showAnimate(points_stack, points_all, PAUSE):
+def showAnimate(points_stack, points_all, PAUSE, range_PCS):
+    set_xylim(range_PCS)
+    plt.pause(PAUSE)
     # plt.scatter(points_all[:, 0], points_all[:, 1], c='r', marker='o')
     plt.scatter(points_stack[:, 0], points_stack[:, 1], c='k', marker='o')
     plt.pause(PAUSE)
+
     plt.clf()
-    plt.axis('equal')
+    # plt.axis('equal')
+    set_xylim(range_PCS)
     plt.scatter(points_all[:, 0], points_all[:, 1], c='r', marker='o')
     plt.scatter(points_stack[:, 0], points_stack[:, 1], c='k', marker='o')
     plt.pause(PAUSE)
@@ -356,6 +367,32 @@ def showAttr(points_stack, points_all, points):
         plt.scatter(points_arr[:, 0], points_arr[:, 1], c='b', marker='o')
     plt.scatter(points_stack[:, 0], points_stack[:, 1], c='k', marker='o')
     plt.axis('equal')
+
+
+def set_xylim(range_PCS):
+    range_xscale = range_PCS[1] - range_PCS[0]
+    range_xmid = (range_PCS[1] + range_PCS[0]) / 2
+    range_yscale = (range_PCS[3] - range_PCS[2])
+    range_ymid = (range_PCS[3] + range_PCS[2]) / 2
+
+    if range_xscale >= range_yscale:
+        plt.xlim((range_xmid - range_xscale * 2, range_xmid + range_xscale * 2))
+        plt.ylim((range_ymid - range_xscale, range_ymid + range_xscale))
+    else:
+
+        plt.ylim((range_ymid - range_yscale, range_ymid + range_yscale))
+        plt.xlim((range_xmid - range_yscale * 2, range_xmid + range_yscale * 2))
+
+
+def calcRange(points):
+    points_arr = np.array(points)
+    lon_max = points_arr[:, 0].max()
+    lon_min = points_arr[:, 0].min()
+    lat_max = points_arr[:, 1].max()
+    lat_min = points_arr[:, 1].min()
+    range_PCS = [lon_min, lon_max, lat_min, lat_max]
+
+    return range_PCS
 
 
 def checkEnv(DIR_IN, DIR_OUT):
@@ -409,6 +446,8 @@ def main():
             points_each_file, points_stack, way_id, DIS_DELTA)
 
         if len(points_each_file):
+            range_PCS = calcRange(points_each_file)
+
             points_all = np.vstack([points_all, points_each_file])
             all_seg.append(copy.deepcopy(points_each_file))
             if OUTPUT:
@@ -417,16 +456,18 @@ def main():
 
             if INSPECT:
                 plt.figure(0)
-                # mng = plt.get_current_fig_manager()
-                # mng.window.showMaximized()
+                mng_figure0 = plt.get_current_fig_manager()
+                mng_figure0.resize(1600, 800)
                 plt.axis("equal")
-                showAnimate(points_stack, points_all, PAUSE)
+                showAnimate(points_stack, points_all, PAUSE, range_PCS)
 
     print('Done! Set %d junction points.' % points_stack.shape[0])
 
     if INSPECT:
         print('Inspecting ...')
         plt.figure(1)
+        mng_figure1 = plt.get_current_fig_manager()
+        mng_figure1.resize(1600, 800)
         plt.axis('equal')
         plt.scatter(points_all[:, 0], points_all[:, 1], c='r', marker='o')
         showInspect(points_stack, all_seg, points_all, PAUSE)
@@ -436,9 +477,13 @@ def main():
         print('Show attribute.')
         # vel limit
         plt.figure(2)
+        mng_figure2 = plt.get_current_fig_manager()
+        mng_figure2.window.showMaximized()
         showAttr(points_stack, points_all, limit_points)
 
         plt.figure(3)
+        mng_figure3 = plt.get_current_fig_manager()
+        mng_figure3.window.showMaximized()
         # water
         plt.subplot(2, 2, 1)
         showAttr(points_stack, points_all, other_attr_points[0])
@@ -461,13 +506,13 @@ def main():
 
 if __name__ == '__main__':
     print(sys.version)
-    DIR_IN = '/home/mengze/Desktop/GPS_fengtai_Aug20'
-    DIR_OUT = '/home/mengze/Desktop/GPS_fengtai_Aug20_out'
-    SAVE_TXT_POINTS = '/home/mengze/Desktop/GPS_fengtai_Aug20_points.txt'
-    SAVE_TXT_JUNCTIONS = '/home/mengze/Desktop/GPS_fengtai_Aug20_junctions.txt'
+    DIR_IN = '/home/mengze/Desktop/fengtai/rough_terrain/GPS_fengtai_Aug24'
+    DIR_OUT = '/home/mengze/Desktop/GPS_fengtai_Aug24_out'
+    SAVE_TXT_POINTS = '/home/mengze/Desktop/GPS_fengtai_Aug24_points.txt'
+    SAVE_TXT_JUNCTIONS = '/home/mengze/Desktop/GPS_fengtai_Aug24_junctions.txt'
     # [vel] 4.2m/s 8.4m/s
-    # [type] 0:"start_point" 1:"end_point"; 2:"way_point"; 3:"fork_point";
-    #        4:"search_in"; 5:"search_out"; 6:"cruise_start"; 7:"cruise_end"
+    # [id, type] 0:"start_point" 1:"end_point"; 2:"way_point";
+    #            3:"search"; 4:"scout_start"; 5:"scout_start"
     NODE_ATTR = {'vel': ['4.2', '8.4'], 'type': ['0', '1', '2', '3', '4', '5', '6', '7', '-1']}
     # [num] set (2*n+1) points around vel limited point
     # [id] which point needs vel limit
@@ -484,7 +529,8 @@ if __name__ == '__main__':
     DIS_DELTA = 20
     OUTPUT = True
     INSPECT = True
-    PAUSE = 0.05
+    PAUSE = 0.5
+
     seaborn.set()
 
     main()
