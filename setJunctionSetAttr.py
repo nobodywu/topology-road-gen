@@ -334,13 +334,14 @@ def showInspect(points_stack, all_seg, points_all, PAUSE):
 
         set_xylim(range_PCS)
         plt.pause(PAUSE)
-        plt.scatter(relevant_seg[:, 0], relevant_seg[:, 1], c='g', marker='o')
+        plt.scatter(relevant_seg[:, 0], relevant_seg[:, 1], c='g', marker='.')
         plt.scatter(points_stack[:, 0], points_stack[:, 1], c='k', marker='o')
+        plt.scatter(junction_point[0], junction_point[1], c='b', marker='o')
         plt.pause(PAUSE * 2)
         plt.clf()
         # plt.axis('equal')
         set_xylim(range_PCS)
-        plt.scatter(points_all[:, 0], points_all[:, 1], c='r', marker='o')
+        plt.scatter(points_all[:, 0], points_all[:, 1], c='r', marker='.')
         plt.scatter(points_stack[:, 0], points_stack[:, 1], c='k', marker='o')
         plt.pause(PAUSE * 2)
 
@@ -355,16 +356,16 @@ def showAnimate(points_stack, points_all, PAUSE, range_PCS):
     plt.clf()
     # plt.axis('equal')
     set_xylim(range_PCS)
-    plt.scatter(points_all[:, 0], points_all[:, 1], c='r', marker='o')
+    plt.scatter(points_all[:, 0], points_all[:, 1], c='r', marker='.')
     plt.scatter(points_stack[:, 0], points_stack[:, 1], c='k', marker='o')
     plt.pause(PAUSE)
 
 
 def showAttr(points_stack, points_all, points):
     points_arr = np.array(points)
-    plt.scatter(points_all[:, 0], points_all[:, 1], c='r', marker='o')
+    plt.scatter(points_all[:, 0], points_all[:, 1], c='r', marker='.')
     if points:
-        plt.scatter(points_arr[:, 0], points_arr[:, 1], c='b', marker='o')
+        plt.scatter(points_arr[:, 0], points_arr[:, 1], c='b', marker='.')
     plt.scatter(points_stack[:, 0], points_stack[:, 1], c='k', marker='o')
     plt.axis('equal')
 
@@ -458,9 +459,14 @@ def main():
                 plt.figure(0)
                 mng_figure0 = plt.get_current_fig_manager()
                 mng_figure0.resize(1600, 800)
-                plt.axis("equal")
+                # plt.axis("equal")
                 showAnimate(points_stack, points_all, PAUSE, range_PCS)
 
+    plt.clf()
+    plt.axis('equal')
+    plt.scatter(points_all[:, 0], points_all[:, 1], c='r', marker='.')
+    plt.scatter(points_stack[:, 0], points_stack[:, 1], c='k', marker='o')
+    plt.pause(2)
     print('Done! Set %d junction points.' % points_stack.shape[0])
 
     if INSPECT:
@@ -468,10 +474,14 @@ def main():
         plt.figure(1)
         mng_figure1 = plt.get_current_fig_manager()
         mng_figure1.resize(1600, 800)
-        plt.axis('equal')
-        plt.scatter(points_all[:, 0], points_all[:, 1], c='r', marker='o')
+        # plt.axis('equal')
+        plt.scatter(points_all[:, 0], points_all[:, 1], c='r', marker='.')
         showInspect(points_stack, all_seg, points_all, PAUSE)
-        plt.pause(PAUSE)
+        plt.clf()
+        plt.axis('equal')
+        plt.scatter(points_all[:, 0], points_all[:, 1], c='r', marker='.')
+        plt.scatter(points_stack[:, 0], points_stack[:, 1], c='k', marker='o')
+        plt.pause(2)
         print('Inspect display over.')
 
         print('Show attribute.')
@@ -506,7 +516,7 @@ def main():
 
 if __name__ == '__main__':
     print(sys.version)
-    DIR_IN = '/home/mengze/Desktop/fengtai/rough_terrain/GPS_fengtai_Aug24'
+    DIR_IN = '/home/mengze/Desktop/GPS_fengtai_Aug24'
     DIR_OUT = '/home/mengze/Desktop/GPS_fengtai_Aug24_out'
     SAVE_TXT_POINTS = '/home/mengze/Desktop/GPS_fengtai_Aug24_points.txt'
     SAVE_TXT_JUNCTIONS = '/home/mengze/Desktop/GPS_fengtai_Aug24_junctions.txt'
