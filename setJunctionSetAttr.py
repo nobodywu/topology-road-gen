@@ -516,20 +516,20 @@ def main():
 
 if __name__ == '__main__':
     print(sys.version)
-    DIR_IN = '/home/mengze/Desktop/GPS_fengtai_Aug24'
-    DIR_OUT = '/home/mengze/Desktop/GPS_fengtai_Aug24_out'
-    SAVE_TXT_POINTS = '/home/mengze/Desktop/GPS_fengtai_Aug24_points.txt'
-    SAVE_TXT_JUNCTIONS = '/home/mengze/Desktop/GPS_fengtai_Aug24_junctions.txt'
+    DIR_IN = '/home/mengze/Desktop/GPS_warehouse_Aug25'
+    DIR_OUT = '/home/mengze/Desktop/GPS_warehouse_Aug25_out'
+    SAVE_TXT_POINTS = '/home/mengze/Desktop/GPS_warehouse_Aug25_points.txt'
+    SAVE_TXT_JUNCTIONS = '/home/mengze/Desktop/GPS_warehouse_Aug25_junctions.txt'
     # [vel] 4.2m/s 8.4m/s
-    # [id, type] 0:"start_point" 1:"end_point"; 2:"way_point";
-    #            3:"search"; 4:"scout_start"; 5:"scout_start"
+    # {'id': 10001, 'type': 0}       0:"start_point" 1:"end_point"; 2:"way_point";
+    # {'lonlat': [10024], 'type': 3} 3:"search"; 4:"scout_start"; 5:"scout_start"
     NODE_ATTR = {'vel': ['4.2', '8.4'], 'type': ['0', '1', '2', '3', '4', '5', '6', '7', '-1']}
     # [num] set (2*n+1) points around vel limited point
     # [id] which point needs vel limit
     SET_VEL_LIMIT = {'num': 2, 'id': []}
     WATER = {'num': 3, 'id': []}
     SMOKE = {'num': 1, 'id': []}
-    DYN_OB = {'num': 1, 'id': []}
+    DYN_OB = {'num': 1, 'id': [10021]}
     CONCAVE_OB = {'num': 1, 'id': []}
     OTHER_ATTR = [WATER, SMOKE, DYN_OB, CONCAVE_OB]
 
