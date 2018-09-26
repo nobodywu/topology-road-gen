@@ -1,0 +1,363 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="zh-cn" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="zh-cn" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>setJunctionSetAttr module &mdash; Topology Road Gen 1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Topology Road Gen
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">setJunctionSetAttr module</a></li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Topology Road Gen</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>setJunctionSetAttr module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/setJunctionSetAttr.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-setJunctionSetAttr">
+<span id="setjunctionsetattr-module"></span><h1>setJunctionSetAttr module<a class="headerlink" href="#module-setJunctionSetAttr" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="setJunctionSetAttr.addNode">
+<code class="descclassname">setJunctionSetAttr.</code><code class="descname">addNode</code><span class="sig-paren">(</span><em>doc</em>, <em>osmNode</em>, <em>points</em>, <em>NODE_ATTR</em>, <em>limit_id</em>, <em>limit_points</em>, <em>attr_id_all</em>, <em>other_attr_points</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/setJunctionSetAttr.html#addNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setJunctionSetAttr.addNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>功能：为输出的路段XML文件添加node标签。node标签中包含经纬度、速度属性以及其他属性</p>
+<p>输入：xml文件标签对象，node标签父对象，路段中的所有点，路点属性，速度限制id，速度限制点，其他属性id，其他属性点</p>
+<p>输出：速度限制点，其他属性点</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="setJunctionSetAttr.addWay">
+<code class="descclassname">setJunctionSetAttr.</code><code class="descname">addWay</code><span class="sig-paren">(</span><em>doc</em>, <em>osmNode</em>, <em>points</em>, <em>way_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/setJunctionSetAttr.html#addWay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setJunctionSetAttr.addWay" title="Permalink to this definition">¶</a></dt>
+<dd><p>功能：为输出的路段XML文件添加way标签。way标签中包含路段以及路段中所有点的id。</p>
+<p>输入：xml文件标签对象，node标签父对象，路段中的所有点，路段id</p>
+<p>输出：无</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="setJunctionSetAttr.calcDis">
+<code class="descclassname">setJunctionSetAttr.</code><code class="descname">calcDis</code><span class="sig-paren">(</span><em>point</em>, <em>points_stack</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/setJunctionSetAttr.html#calcDis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setJunctionSetAttr.calcDis" title="Permalink to this definition">¶</a></dt>
+<dd><p>功能：计算路段多点到已知所有路口点的距离</p>
+<p>输入：路段中的所有点，已确定的路口点</p>
+<p>输出：到已知所有路口点的距离</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="setJunctionSetAttr.calcRange">
+<code class="descclassname">setJunctionSetAttr.</code><code class="descname">calcRange</code><span class="sig-paren">(</span><em>points</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/setJunctionSetAttr.html#calcRange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setJunctionSetAttr.calcRange" title="Permalink to this definition">¶</a></dt>
+<dd><p>功能：计算路段中点的范围</p>
+<p>输入：路段中的点</p>
+<p>输出：路段中点的范围</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="setJunctionSetAttr.checkEnv">
+<code class="descclassname">setJunctionSetAttr.</code><code class="descname">checkEnv</code><span class="sig-paren">(</span><em>DIR_IN</em>, <em>DIR_OUT</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/setJunctionSetAttr.html#checkEnv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setJunctionSetAttr.checkEnv" title="Permalink to this definition">¶</a></dt>
+<dd><p>功能：检查输入和输出环境。
+如果输入的文件夹不存在，则打印提示并结束程序；
+如果有，删除已存在的输出文件夹，并创建一个空文件夹。</p>
+<p>输入：输入目录，输出目录</p>
+<p>输出：无</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="setJunctionSetAttr.findAllPath">
+<code class="descclassname">setJunctionSetAttr.</code><code class="descname">findAllPath</code><span class="sig-paren">(</span><em>dir_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/setJunctionSetAttr.html#findAllPath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setJunctionSetAttr.findAllPath" title="Permalink to this definition">¶</a></dt>
+<dd><p>功能：读取目录下所有路网文件，忽略空文件和文件名称不正确的文件。
+正确的文件名应为N0000.xml，N为正整数。</p>
+<p>输入：文件目录</p>
+<p>输出：目录下所有路段文件名</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="setJunctionSetAttr.findAttrID">
+<code class="descclassname">setJunctionSetAttr.</code><code class="descname">findAttrID</code><span class="sig-paren">(</span><em>points</em>, <em>EACH_ATTR</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/setJunctionSetAttr.html#findAttrID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setJunctionSetAttr.findAttrID" title="Permalink to this definition">¶</a></dt>
+<dd><p>功能：根据属性id找到对应点。</p>
+<p>输入：路段中的所有点，各个属性id</p>
+<p>输出：属性id对应路段中的点</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="setJunctionSetAttr.findLimitID">
+<code class="descclassname">setJunctionSetAttr.</code><code class="descname">findLimitID</code><span class="sig-paren">(</span><em>points</em>, <em>SET_VEL_LIMIT</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/setJunctionSetAttr.html#findLimitID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setJunctionSetAttr.findLimitID" title="Permalink to this definition">¶</a></dt>
+<dd><p>功能：根据速度限制id找到对应点。并且为路口附近的点进行速度限制。</p>
+<p>输入：路段中的所有点，速度限制id</p>
+<p>输出：速度限制id对应路段中的点</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="setJunctionSetAttr.main">
+<code class="descclassname">setJunctionSetAttr.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/setJunctionSetAttr.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setJunctionSetAttr.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>功能：读取没有路口点的路段XML文件，输出带有路口点的路段XML文件</p>
+<p>输入：参考模块说明</p>
+<p>输出：生成带有路口点的路段XML文件并保存路网中所有点、所有路口点为txt</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="setJunctionSetAttr.parseXML">
+<code class="descclassname">setJunctionSetAttr.</code><code class="descname">parseXML</code><span class="sig-paren">(</span><em>filepath</em>, <em>count</em>, <em>MAX</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/setJunctionSetAttr.html#parseXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setJunctionSetAttr.parseXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>功能：解析路段XML文件。
+提取标签node中的经纬度和id号，如果没有node标签，打印提示信息；
+提取way标签中的路段id号，如果没有way标签，打印提示信息。
+如果有空文件，自动按顺序排列路段id。</p>
+<p>输入：XML文件路径，空文件数量，路段点最大个数</p>
+<p>输出：路段中的所有点，路段id，空文件数量</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="setJunctionSetAttr.saveData">
+<code class="descclassname">setJunctionSetAttr.</code><code class="descname">saveData</code><span class="sig-paren">(</span><em>points_all</em>, <em>points_stack</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/setJunctionSetAttr.html#saveData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setJunctionSetAttr.saveData" title="Permalink to this definition">¶</a></dt>
+<dd><p>功能：保存路网中所有点，保存路网中所有路口点。保存点的经纬度和id信息，经纬度精度为小数点后8位。</p>
+<p>输入：路网中所有点，所有路口点</p>
+<p>输出：无</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="setJunctionSetAttr.setIntersection">
+<code class="descclassname">setJunctionSetAttr.</code><code class="descname">setIntersection</code><span class="sig-paren">(</span><em>points</em>, <em>points_stack</em>, <em>way_id</em>, <em>DIS_DELTA</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/setJunctionSetAttr.html#setIntersection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setJunctionSetAttr.setIntersection" title="Permalink to this definition">¶</a></dt>
+<dd><p>功能：自动判断路段的端点是否为路网中的路口点。</p>
+<p>输入：路段中的所有点，已确定的路口点，路段id，路口点判断的距离依据</p>
+<p>输出：路段中的所有点，已确定的路口点</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="setJunctionSetAttr.set_xylim">
+<code class="descclassname">setJunctionSetAttr.</code><code class="descname">set_xylim</code><span class="sig-paren">(</span><em>range_PCS</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/setJunctionSetAttr.html#set_xylim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setJunctionSetAttr.set_xylim" title="Permalink to this definition">¶</a></dt>
+<dd><p>功能：根据路点范围计算坐标轴范围。</p>
+<p>输入：路段中点的范围</p>
+<p>输出：无</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="setJunctionSetAttr.showAnimate">
+<code class="descclassname">setJunctionSetAttr.</code><code class="descname">showAnimate</code><span class="sig-paren">(</span><em>points_stack</em>, <em>points_all</em>, <em>PAUSE</em>, <em>range_PCS</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/setJunctionSetAttr.html#showAnimate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setJunctionSetAttr.showAnimate" title="Permalink to this definition">¶</a></dt>
+<dd><p>功能：在判断路段端点是否为已知路口点的时候用动画显示，以便检查。</p>
+<p>输入：已知的所有路口点，路网中的所有点，暂停时间，路段范围</p>
+<p>输出：无</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="setJunctionSetAttr.showAttr">
+<code class="descclassname">setJunctionSetAttr.</code><code class="descname">showAttr</code><span class="sig-paren">(</span><em>points_stack</em>, <em>points_all</em>, <em>points</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/setJunctionSetAttr.html#showAttr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setJunctionSetAttr.showAttr" title="Permalink to this definition">¶</a></dt>
+<dd><p>功能：用蓝色显示带有属性的点。</p>
+<p>输入：已知的所有路口点，路网中的所有点，路段中的点</p>
+<p>输出：无</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="setJunctionSetAttr.showInspect">
+<code class="descclassname">setJunctionSetAttr.</code><code class="descname">showInspect</code><span class="sig-paren">(</span><em>points_stack</em>, <em>all_seg</em>, <em>points_all</em>, <em>PAUSE</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/setJunctionSetAttr.html#showInspect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setJunctionSetAttr.showInspect" title="Permalink to this definition">¶</a></dt>
+<dd><p>功能：检查路口点与周围的路段连接关系是否正确。查找每个路口点相连的路段并用不同颜色显示。</p>
+<p>输入：已知的路口点，路网中的所有路段，路网中的所有点</p>
+<p>输出：无</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="setJunctionSetAttr.stackPoint">
+<code class="descclassname">setJunctionSetAttr.</code><code class="descname">stackPoint</code><span class="sig-paren">(</span><em>point</em>, <em>points_stack</em>, <em>DIS_DELTA</em>, <em>index_str=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/setJunctionSetAttr.html#stackPoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setJunctionSetAttr.stackPoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>功能：根据路口点距离判距，保存路口点。
+找到路段端点距已知路口点的最小距离的点，如果该距离小于DIS_DELTA，则该点为路口点
+否则为新的路口点。</p>
+<p>输入：路段中的所有点，已确定的路口点，路口点判断的距离依据</p>
+<p>输出：已确定的路口点，路段端点</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="setJunctionSetAttr.writeXML">
+<code class="descclassname">setJunctionSetAttr.</code><code class="descname">writeXML</code><span class="sig-paren">(</span><em>points</em>, <em>way_id</em>, <em>NODE_ATTR</em>, <em>SET_VEL_LIMIT</em>, <em>limit_points</em>, <em>OTHER_ATTR</em>, <em>other_attr_points</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/setJunctionSetAttr.html#writeXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setJunctionSetAttr.writeXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>功能：生成带有路口点的路段XML文件，并为路段上每个点加上需要的属性。</p>
+<p>输入：路段中的所有点，路段id，路点属性，限速属性id，限速点，其他属性id，其他属性点</p>
+<p>输出：限速点，其他属性点</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Wu Mengze.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0',
+            LANGUAGE:'zh-cn',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

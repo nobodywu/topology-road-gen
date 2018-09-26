@@ -1,0 +1,301 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="zh-cn" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="zh-cn" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>selectTaskPoints &mdash; Topology Road Gen 1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Topology Road Gen
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Topology Road Gen</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>selectTaskPoints</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for selectTaskPoints</h1><div class="highlight"><pre>
+<span></span><span class="c1"># !/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">seaborn</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pyproj</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../selectTaskPoints.html#selectTaskPoints.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ********模块功能********\n</span>
+<span class="sd">    该模块为生成任务文件而设计，设置id/属性 or 经纬度/属性，即可生成任务文件。\n</span>
+<span class="sd">    ********变量说明********\n</span>
+<span class="sd">    SAVE_TXT_POINTS: 保存路网中所有点。保存点的经纬度和id信息，经纬度精度为小数点后8位\n</span>
+<span class="sd">    SAVE_TXT_JUNCTIONS: 保存路网中所有路口点。保存点的经纬度和id信息，经纬度精度为小数点后8位\n</span>
+<span class="sd">    SAVE_TASK: 生成的txt路网文件\n</span>
+<span class="sd">    p1: 地理坐标系统WGS84，可参考https://blog.csdn.net/NobodyWu/article/details/81158298\n</span>
+<span class="sd">    p2: 投影坐标系统\n</span>
+<span class="sd">    TASK_POINTS: 需要设置的任务点，格式为id/属性 or 经纬度/属性</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">SAVE_TXT_POINTS</span> <span class="o">=</span> <span class="s1">&#39;/home/mengze/Desktop/GPS_yuebingcun_Sep11_final02_points.txt&#39;</span>
+    <span class="n">SAVE_TXT_JUNCTIONS</span> <span class="o">=</span> <span class="s1">&#39;/home/mengze/Desktop/GPS_yuebingcun_Sep11_final02_junctions.txt&#39;</span>
+    <span class="n">SAVE_TASK</span> <span class="o">=</span> <span class="s1">&#39;/home/mengze/Desktop/TaskPoints_yuebingcun_Sep11_02.txt&#39;</span>
+    <span class="n">p1</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">Proj</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="s2">&quot;epsg:4326&quot;</span><span class="p">)</span>
+    <span class="n">p2</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">Proj</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="s2">&quot;epsg:3857&quot;</span><span class="p">)</span>
+    <span class="c1"># {&#39;id&#39;: 10001, &#39;type&#39;: 0}       0:&quot;start_point&quot; 1:&quot;end_point&quot;; 2:&quot;way_point&quot;;</span>
+    <span class="c1"># {&#39;lonlat&#39;: [lon, lat], &#39;type&#39;: 3} 3:&quot;search&quot;; 4:&quot;scout_start&quot;; 5:&quot;scout_start&quot;</span>
+    <span class="n">TASK_POINTS</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">2450011</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">3960005</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+                   <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">3950003</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">3620002</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+                   <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">3600036</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">3320011</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+                   <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">3000004</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">2820003</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+                   <span class="p">{</span><span class="s1">&#39;lonlat&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">116.09991583</span><span class="p">,</span> <span class="mf">40.15605410</span><span class="p">],</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">},</span>
+                   <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">860009</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">2130005</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+                   <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">1880007</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+                   <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">1600017</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">1530007</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+                   <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">1000015</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">560011</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+                   <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">450032</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">450006</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+                   <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">970012</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+                   <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">210005</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">1720005</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+
+                   <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">60003</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+                   <span class="p">]</span>
+
+    <span class="n">points_all</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">SAVE_TXT_POINTS</span><span class="p">)</span>
+    <span class="n">points_junctions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">SAVE_TXT_JUNCTIONS</span><span class="p">)</span>
+
+    <span class="n">points_all</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">points_all</span><span class="p">)</span>
+    <span class="n">TASK_POINTS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">TASK_POINTS</span><span class="p">)</span>
+
+    <span class="n">task</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">each</span> <span class="ow">in</span> <span class="n">TASK_POINTS</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;id&#39;</span> <span class="ow">in</span> <span class="n">each</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">find</span> <span class="o">=</span> <span class="n">points_all</span><span class="p">[</span><span class="n">points_all</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">each</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span>
+                <span class="n">find</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">find</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">each</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span>
+                <span class="n">task</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">task</span><span class="p">,</span> <span class="n">find</span><span class="p">))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ID:</span><span class="si">%d</span><span class="s1"> can</span><span class="se">\&#39;</span><span class="s1">t find.&#39;</span> <span class="o">%</span> <span class="n">each</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="s1">&#39;lonlat&#39;</span> <span class="ow">in</span> <span class="n">each</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">find</span> <span class="o">=</span> <span class="p">[</span><span class="n">each</span><span class="p">[</span><span class="s1">&#39;lonlat&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">each</span><span class="p">[</span><span class="s1">&#39;lonlat&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="mi">00000</span><span class="p">,</span> <span class="n">each</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]]</span>
+            <span class="n">task</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">task</span><span class="p">,</span> <span class="n">find</span><span class="p">))</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">SAVE_TASK</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">each</span> <span class="ow">in</span> <span class="n">task</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> </span><span class="si">%.8f</span><span class="s1"> </span><span class="si">%.8f</span><span class="s1"> </span><span class="si">%.8f</span><span class="s1"> </span><span class="si">%d</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="n">each</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">each</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">each</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">points_all</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">points_all</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
+        <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">points_all</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">points_all</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">points_junctions</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">points_junctions</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
+        <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">points_junctions</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">points_junctions</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">task</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">task</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">task</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">task</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">seaborn</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">points_all</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">points_all</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">points_junctions</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">points_junctions</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">)</span>
+
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">task_point</span> <span class="ow">in</span> <span class="n">task</span><span class="p">:</span>
+        <span class="n">number</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1">(type: </span><span class="si">%d</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">task_point</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">task_point</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">task_point</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;bo&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">task_point</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">task_point</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">number</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Wu Mengze.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'1.0',
+            LANGUAGE:'zh-cn',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

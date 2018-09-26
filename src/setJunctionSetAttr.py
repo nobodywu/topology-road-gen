@@ -11,6 +11,12 @@ import copy
 
 
 def findAllPath(dir_name):
+    """
+    功能：读取目录下所有路网文件，忽略空文件和文件名称不正确的文件。
+    正确的文件名应为N0000.xml，N为正整数。\n
+    输入：文件目录\n
+    输出：目录下所有路段文件名
+    """
     print("******Finding files ******")
     for maindir, subdir, file_list_str in os.walk(dir_name):
         file_list = []
@@ -33,6 +39,14 @@ def findAllPath(dir_name):
 
 
 def parseXML(filepath, count, MAX):
+    """
+    功能：解析路段XML文件。
+    提取标签node中的经纬度和id号，如果没有node标签，打印提示信息；
+    提取way标签中的路段id号，如果没有way标签，打印提示信息。
+    如果有空文件，自动按顺序排列路段id。\n
+    输入：XML文件路径，空文件数量，路段点最大个数\n
+    输出：路段中的所有点，路段id，空文件数量
+    """
     print("******Parsing <%s>******" % filepath)
     points = []
     DOMTree = xml.dom.minidom.parse(filepath)
@@ -73,6 +87,11 @@ def parseXML(filepath, count, MAX):
 
 
 def setIntersection(points, points_stack, way_id, DIS_DELTA):
+    """
+    功能：自动判断路段的端点是否为路网中的路口点。\n
+    输入：路段中的所有点，已确定的路口点，路段id，路口点判断的距离依据\n
+    输出：路段中的所有点，已确定的路口点
+    """
     print('******Setting junction point. Way id: %d******' % way_id)
 
     shape = points_stack.shape
@@ -96,6 +115,11 @@ def setIntersection(points, points_stack, way_id, DIS_DELTA):
 
 
 def calcDis(point, points_stack):
+    """
+    功能：计算路段多点到已知所有路口点的距离\n
+    输入：路段中的所有点，已确定的路口点\n
+    输出：到已知所有路口点的距离
+    """
     lon_delta = np.subtract(point[0], points_stack[:, 0])
     lat_delta = np.subtract(point[1], points_stack[:, 1])
     dis = np.sqrt(np.multiply(lon_delta, lon_delta) + np.multiply(lat_delta, lat_delta))
@@ -105,6 +129,13 @@ def calcDis(point, points_stack):
 
 
 def stackPoint(point, points_stack, DIS_DELTA, index_str=''):
+    """
+    功能：根据路口点距离判距，保存路口点。
+    找到路段端点距已知路口点的最小距离的点，如果该距离小于DIS_DELTA，则该点为路口点
+    否则为新的路口点。\n
+    输入：路段中的所有点，已确定的路口点，路口点判断的距离依据\n
+    输出：已确定的路口点，路段端点
+    """
     points_stack_dis = calcDis(point, points_stack)
     # print(points_stack_dis)
     point_stack_dis_min = points_stack_dis.min(axis=0)
@@ -129,6 +160,11 @@ def stackPoint(point, points_stack, DIS_DELTA, index_str=''):
 
 
 def writeXML(points, way_id, NODE_ATTR, SET_VEL_LIMIT, limit_points, OTHER_ATTR, other_attr_points):
+    """
+    功能：生成带有路口点的路段XML文件，并为路段上每个点加上需要的属性。\n
+    输入：路段中的所有点，路段id，路点属性，限速属性id，限速点，其他属性id，其他属性点\n
+    输出：限速点，其他属性点
+    """
     print('******Writing XML******')
 
     doc = xml.dom.minidom.Document()
@@ -166,6 +202,11 @@ def writeXML(points, way_id, NODE_ATTR, SET_VEL_LIMIT, limit_points, OTHER_ATTR,
 
 
 def findAttrID(points, EACH_ATTR):
+    """
+    功能：根据属性id找到对应点。\n
+    输入：路段中的所有点，各个属性id\n
+    输出：属性id对应路段中的点
+    """
     attr_id = np.empty(shape=[0, ])
     lenth = len(points)
     points_arr = np.array(points)
@@ -194,6 +235,11 @@ def findAttrID(points, EACH_ATTR):
 
 
 def findLimitID(points, SET_VEL_LIMIT):
+    """
+    功能：根据速度限制id找到对应点。并且为路口附近的点进行速度限制。\n
+    输入：路段中的所有点，速度限制id\n
+    输出：速度限制id对应路段中的点
+    """
     limit_id = np.empty(shape=[0, ])
 
     lenth = len(points)
@@ -229,6 +275,11 @@ def findLimitID(points, SET_VEL_LIMIT):
 
 
 def addNode(doc, osmNode, points, NODE_ATTR, limit_id, limit_points, attr_id_all, other_attr_points):
+    """
+    功能：为输出的路段XML文件添加node标签。node标签中包含经纬度、速度属性以及其他属性\n
+    输入：xml文件标签对象，node标签父对象，路段中的所有点，路点属性，速度限制id，速度限制点，其他属性id，其他属性点\n
+    输出：速度限制点，其他属性点
+    """
     count = 0
     for point in points:
         point[0], point[1] = pyproj.transform(p2, p1, point[0], point[1])
@@ -256,7 +307,7 @@ def addNode(doc, osmNode, points, NODE_ATTR, limit_id, limit_points, attr_id_all
             other_attr_points[0].append(copy.deepcopy(point))
             pointNode.setAttribute('water', '1')
         else:
-            pointNode.setAttribute('water', '0')
+            pointNode.setAttribute('water', '1')
 
         # smoke
         find_smoke = attr_id_all[1] == point[2]
@@ -264,7 +315,7 @@ def addNode(doc, osmNode, points, NODE_ATTR, limit_id, limit_points, attr_id_all
             other_attr_points[1].append(copy.deepcopy(point))
             pointNode.setAttribute('smoke', '1')
         else:
-            pointNode.setAttribute('smoke', '0')
+            pointNode.setAttribute('smoke', '1')
 
         # dyn_ob
         find_dyn_ob = attr_id_all[2] == point[2]
@@ -272,7 +323,7 @@ def addNode(doc, osmNode, points, NODE_ATTR, limit_id, limit_points, attr_id_all
             other_attr_points[2].append(copy.deepcopy(point))
             pointNode.setAttribute('dyn_ob', '1')
         else:
-            pointNode.setAttribute('dyn_ob', '0')
+            pointNode.setAttribute('dyn_ob', '1')
 
         # concave_ob
         find_concave_ob = attr_id_all[3] == point[2]
@@ -280,11 +331,11 @@ def addNode(doc, osmNode, points, NODE_ATTR, limit_id, limit_points, attr_id_all
             other_attr_points[3].append(copy.deepcopy(point))
             pointNode.setAttribute('concave_ob', '1')
         else:
-            pointNode.setAttribute('concave_ob', '0')
+            pointNode.setAttribute('concave_ob', '1')
 
-        # 设置两端的type属性为3，代表路口点
+        # NODE_ATTR['type'][3]='-3'
         if (count == 1) | (count == len(points)):
-            pointNode.setAttribute('type', NODE_ATTR['type'][3])
+            pointNode.setAttribute('type', NODE_ATTR['type'][-1])
             point_tagNode = doc.createElement("tag")
             point_tagNode.setAttribute('k', "highway")
             point_tagNode.setAttribute('v', "traffic_signals")
@@ -298,6 +349,11 @@ def addNode(doc, osmNode, points, NODE_ATTR, limit_id, limit_points, attr_id_all
 
 
 def addWay(doc, osmNode, points, way_id):
+    """
+    功能：为输出的路段XML文件添加way标签。way标签中包含路段以及路段中所有点的id。\n
+    输入：xml文件标签对象，node标签父对象，路段中的所有点，路段id\n
+    输出：无
+    """
     way_id_str = '%d' % way_id
     wayNode = doc.createElement("way")
     wayNode.setAttribute('id', way_id_str)
@@ -318,7 +374,11 @@ def addWay(doc, osmNode, points, way_id):
 
 
 def showInspect(points_stack, all_seg, points_all, PAUSE):
-
+    """
+    功能：检查路口点与周围的路段连接关系是否正确。查找每个路口点相连的路段并用不同颜色显示。\n
+    输入：已知的路口点，路网中的所有路段，路网中的所有点\n
+    输出：无
+    """
     for junction_point in points_stack:
         relevant_seg = np.empty(shape=[0, 3])
 
@@ -347,6 +407,11 @@ def showInspect(points_stack, all_seg, points_all, PAUSE):
 
 
 def showAnimate(points_stack, points_all, PAUSE, range_PCS):
+    """
+    功能：在判断路段端点是否为已知路口点的时候用动画显示，以便检查。\n
+    输入：已知的所有路口点，路网中的所有点，暂停时间，路段范围\n
+    输出：无
+    """
     set_xylim(range_PCS)
     plt.pause(PAUSE)
     # plt.scatter(points_all[:, 0], points_all[:, 1], c='r', marker='o')
@@ -362,6 +427,11 @@ def showAnimate(points_stack, points_all, PAUSE, range_PCS):
 
 
 def showAttr(points_stack, points_all, points):
+    """
+    功能：用蓝色显示带有属性的点。\n
+    输入：已知的所有路口点，路网中的所有点，路段中的点\n
+    输出：无
+    """
     points_arr = np.array(points)
     plt.scatter(points_all[:, 0], points_all[:, 1], c='r', marker='.')
     if points:
@@ -371,6 +441,11 @@ def showAttr(points_stack, points_all, points):
 
 
 def set_xylim(range_PCS):
+    """
+    功能：根据路点范围计算坐标轴范围。\n
+    输入：路段中点的范围\n
+    输出：无
+    """
     range_xscale = range_PCS[1] - range_PCS[0]
     range_xmid = (range_PCS[1] + range_PCS[0]) / 2
     range_yscale = (range_PCS[3] - range_PCS[2])
@@ -386,6 +461,11 @@ def set_xylim(range_PCS):
 
 
 def calcRange(points):
+    """
+    功能：计算路段中点的范围\n
+    输入：路段中的点\n
+    输出：路段中点的范围
+    """
     points_arr = np.array(points)
     lon_max = points_arr[:, 0].max()
     lon_min = points_arr[:, 0].min()
@@ -397,6 +477,13 @@ def calcRange(points):
 
 
 def checkEnv(DIR_IN, DIR_OUT):
+    """
+    功能：检查输入和输出环境。
+    如果输入的文件夹不存在，则打印提示并结束程序；
+    如果有，删除已存在的输出文件夹，并创建一个空文件夹。\n
+    输入：输入目录，输出目录\n
+    输出：无
+    """
     if not os.path.isdir(DIR_IN):
         print('DIR <%s> not exists.' % DIR_IN)
         sys.exit()
@@ -414,17 +501,24 @@ def checkEnv(DIR_IN, DIR_OUT):
 
 def saveData(points_all, points_stack):
     '''
-    lat lon
+    功能：保存路网中所有点，保存路网中所有路口点。保存点的经纬度和id信息，经纬度精度为小数点后8位。\n
+    输入：路网中所有点，所有路口点\n
+    输出：无
     '''
     points_all[:, 0], points_all[:, 1] = pyproj.transform(
         p2, p1, points_all[:, 0], points_all[:, 1])
     points_stack[:, 0], points_stack[:, 1] = pyproj.transform(
         p2, p1, points_stack[:, 0], points_stack[:, 1])
-    np.savetxt(SAVE_TXT_POINTS, points_all)
-    np.savetxt(SAVE_TXT_JUNCTIONS, points_stack)
+    np.savetxt(SAVE_TXT_POINTS, points_all, fmt='%.8f %.8f %d')
+    np.savetxt(SAVE_TXT_JUNCTIONS, points_stack, fmt='%.8f %.8f %d')
 
 
 def main():
+    """
+    功能：读取没有路口点的路段XML文件，输出带有路口点的路段XML文件\n
+    输入：参考模块说明\n
+    输出：生成带有路口点的路段XML文件并保存路网中所有点、所有路口点为txt
+    """
     checkEnv(DIR_IN, DIR_OUT)
 
     filepath_in = findAllPath(DIR_IN)
@@ -443,6 +537,7 @@ def main():
     for each in filepath_in:
         points_each_file = []
         points_each_file, way_id, count_empty_file = parseXML(each, count_empty_file, MAX)
+
         points_each_file, points_stack = setIntersection(
             points_each_file, points_stack, way_id, DIS_DELTA)
 
@@ -515,22 +610,51 @@ def main():
 
 
 if __name__ == '__main__':
+    """
+    ********模块功能********\n
+    该模块简化了Qt程序CreateXMLWithLatLon对路网的构建，并可以根据需要为路网中的点添加不同的属性。
+    为了检查路网中路口点是否正确设计了检查动画方便检查。
+    使用SET_VEL_LIMIT、和OTHER_ATTR为路点设置属性步骤：\n
+    1. 清空上述两个变量中的id\n
+    2. 运行程序生成\n
+    3. 使用google earth导入***_points.txt文件，查看需要设置属性点的id\n
+    4. 在程序中为上述两个变量添加id，重新运行程序\n
+    ********变量说明********\n
+    DIR_IN: 输入文件夹，文件夹中包含路段xml文件，文件中没有路口点\n
+    DIR_OUT: 输出文件夹，生成带有路口点的路段xml文件\n
+    SAVE_TXT_POINTS: 保存路网中所有点。保存点的经纬度和id信息，经纬度精度为小数点后8位\n
+    SAVE_TXT_JUNCTIONS: 保存路网中所有路口点。保存点的经纬度和id信息，经纬度精度为小数点后8位\n
+    NODE_ATTR: 路点的限速和属性\n
+    SET_VEL_LIMIT: 限速点id\n
+    WATER: 水属性id\n
+    SMOKE: 烟雾属性id\n
+    DYN_OB: 动态障碍物属性id\n
+    CONCAVE_OB: 凹障碍属性id\n
+    OTHER_ATTR: 包含水、烟雾、动态障碍物和凹障碍属性\n
+    p1: 地理坐标系统WGS84，可参考https://blog.csdn.net/NobodyWu/article/details/81158298\n
+    p2: 投影坐标系统\n
+    MAX: 路段上点最大个数\n
+    DIS_DELTA: 路口点判距\n
+    OUTPUT: 文件输出开关\n
+    INSPECT: 检查开关\n
+    PAUSE: 检查中每段路显示暂停时间
+    """
     print(sys.version)
-    DIR_IN = '/home/mengze/Desktop/GPS_warehouse_Aug25'
-    DIR_OUT = '/home/mengze/Desktop/GPS_warehouse_Aug25_out'
-    SAVE_TXT_POINTS = '/home/mengze/Desktop/GPS_warehouse_Aug25_points.txt'
-    SAVE_TXT_JUNCTIONS = '/home/mengze/Desktop/GPS_warehouse_Aug25_junctions.txt'
-    # [vel] 4.2m/s 8.4m/s
+    DIR_IN = '/home/mengze/Desktop/GPS_yuebingcun_Sep15_03'
+    DIR_OUT = '/home/mengze/Desktop/6T3.55_GPS_yuebingcun_Sep15_03_out'
+    SAVE_TXT_POINTS = '/home/mengze/Desktop/GPS_yuebingcun_Sep15_03_points.txt'
+    SAVE_TXT_JUNCTIONS = '/home/mengze/Desktop/GPS_yuebingcun_Sep15_03_junctions.txt'
+    # [vel] m/s
     # {'id': 10001, 'type': 0}       0:"start_point" 1:"end_point"; 2:"way_point";
     # {'lonlat': [10024], 'type': 3} 3:"search"; 4:"scout_start"; 5:"scout_start"
-    NODE_ATTR = {'vel': ['4.2', '8.4'], 'type': ['0', '1', '2', '3', '4', '5', '6', '7', '-1']}
+    NODE_ATTR = {'vel': ['3.5', '5'], 'type': ['0', '1', '2', '-3', '4', '5', '6', '7', '-1']}
     # [num] set (2*n+1) points around vel limited point
     # [id] which point needs vel limit
     SET_VEL_LIMIT = {'num': 2, 'id': []}
-    WATER = {'num': 3, 'id': []}
-    SMOKE = {'num': 1, 'id': []}
-    DYN_OB = {'num': 1, 'id': [10021]}
-    CONCAVE_OB = {'num': 1, 'id': []}
+    WATER = {'num': 2, 'id': []}
+    SMOKE = {'num': 2, 'id': []}
+    DYN_OB = {'num': 2, 'id': []}
+    CONCAVE_OB = {'num': 2, 'id': []}
     OTHER_ATTR = [WATER, SMOKE, DYN_OB, CONCAVE_OB]
 
     p1 = pyproj.Proj(init="epsg:4326")
