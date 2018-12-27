@@ -13,12 +13,14 @@ import webbrowser
 import setJunctions as sj
 
 # import random
+#
 
 
 class HyperlinkMessageBox(tk.Toplevel):
     '''
     HyperlinkMessageBox类的代码来自Stack Overflow的问题'tk tkMessageBox html link'
     https://stackoverflow.com/questions/13508043/tk-tkmessagebox-html-link
+    打开链接时会有报错
     '''
     hyperlinkPattern = re.compile(r'<a href="(?P<address>.*?)">(?P<title>.*?)'
                                   '</a>')
@@ -184,7 +186,7 @@ class App(tk.Frame):
         # self.canvas.focus_lastfor()
         if len(self.itemSelected):
             item = self.itemSelected.pop()
-            self.canvas.itemconfig(item, fill='red')
+            self.canvas.itemconfig(item, fill='red', outline='red')
             # print(self.itemSelected)
             # print('deleted last point')
         else:
@@ -201,7 +203,7 @@ class App(tk.Frame):
             items = self.allSegItem.pop()
             print(items)
             for item in items:
-                self.canvas.itemconfig(item, fill='red')
+                self.canvas.itemconfig(item, fill='red', outline='red')
 
             print('removed last segment')
             print('remain %d, %d segments.' % (len(self.allSeg), len(self.allSegItem)))
@@ -218,14 +220,14 @@ class App(tk.Frame):
         if len(self.itemSelected):
             for item in self.itemSelected:
                 segment.append(self.points[item[0] - 1])  # item start from 1
-                self.canvas.itemconfig(item, fill='green')
+                self.canvas.itemconfig(item, fill='green', outline='green')
 
             self.allSeg.append(segment)
             self.allSegItem.append(self.itemSelected)  # 为了知道每段点的tagsorid，在删除时更改颜色
             print(self.allSeg)
             print('%d, %d segments' % (len(self.allSeg), len(self.allSegItem)))
             print('segment appended')
-            text = '已保存%d段路' % len(self.allSeg)
+            text = '已确认%d段路' % len(self.allSeg)
             tm.showinfo('提示', text)
             self.itemSelected = []
         else:
@@ -242,7 +244,7 @@ class App(tk.Frame):
         print(item[0], self.points[item[0] - 1])  # item start from 1
         currentColor = self.canvas.itemcget(item, 'fill')
         if (currentColor == 'red') | (currentColor == 'green'):
-            self.canvas.itemconfig(item, fill='black')
+            self.canvas.itemconfig(item, fill='black', outline='black')
             self.itemSelected.append(item)
             print(self.itemSelected)  # for item in itemSelected: points[item[0]]
 
@@ -316,21 +318,26 @@ class App(tk.Frame):
         yRange = pointsRangePCS[3] - pointsRangePCS[2]
 
         xRatio = xRange / 1200
-        xRatio = yRange / 800
+        yRatio = yRange / 800
 
-        if xRatio <= yRange:
-            xyscale = 800
+        if xRatio <= yRatio:
+            scale = yRatio
         else:
-            xyscale = 1200
+            scale = xRatio
 
         for i in range(pointsPCS.shape[0]):
             # print(i)
 
-            posX = (pointsPCS[i, 0] - pointsRangePCS[0]) * xyscale / xRange
+            # posX = (pointsPCS[i, 0] - pointsRangePCS[0]) * xyscale / xRange
             # reverse y-axis
-            posY = (1 - (pointsPCS[i, 1] - pointsRangePCS[2]) / yRange) * xyscale
+            # posY = (1 - (pointsPCS[i, 1] - pointsRangePCS[2]) / yRange) * xyscale
+
+            posX = (pointsPCS[i, 0] - pointsRangePCS[0]) / scale
+            # reverse y-axis
+            posY = 800 - (pointsPCS[i, 1] - pointsRangePCS[2]) / scale
+
             self.canvas.create_oval(posX - 4, posY - 4, posX + 4, posY + 4,
-                                    fill='red', tags=i + 1)  # item start from 1
+                                    fill='red', outline='red', tags=i + 1)  # item start from 1
 
     def getPoints(self):
         '''
