@@ -16,17 +16,27 @@ def parseKML(KML_FILE):
     try:
         with open(KML_FILE, 'r') as f:
             kml = parser.parse(f).getroot()
-            placemarks = kml.findall('.//{http://www.opengis.net/kml/2.2}Placemark')
-            print('File %s has %d placemarks.' % (KML_FILE, len(placemarks)))
-            for each in placemarks:
-                coords = str(each.LineString.coordinates)
-                points_seg = coords.strip().split(' ')
-                for each in points_seg:
-                    each = each.split(',')
-                    points_all.append(each)
     except:
         print('Can not find % s.' % KML_FILE)
         sys.exit()
+
+    linestrings = kml.findall('.//{http://www.opengis.net/kml/2.2}LineString')
+    print('File %s has %d LineString.' % (KML_FILE, len(linestrings)))
+    if len(linestrings):
+        for each in linestrings:
+            coords = str(each.coordinates)
+            points_seg = coords.strip().split(' ')
+            for each in points_seg:
+                each = each.split(',')
+                points_all.append(each)
+
+    points = kml.findall('.//{http://www.opengis.net/kml/2.2}Point')
+    print('File %s has %d Point.' % (KML_FILE, len(points)))
+    if len(points):
+        for each in points:
+            coords = str(each.coordinates)
+            each = coords.split(',')
+            points_all.append(each)
 
     return points_all
 
@@ -86,8 +96,8 @@ if __name__ == '__main__':
     INTERVAL: 写入txt文件时的点间隔\n
     POINT_ATTRIBUTE: 点属性
     """
-    KML_FILE = '/home/mengze/Desktop/yuebingcun_Sep15_03.kml'
-    TXT_FILE = '/home/mengze/Desktop/yuebingcun_Sep15_03.txt'
+    KML_FILE = '/home/mengze/Desktop/yuanshi.kml'
+    TXT_FILE = '/home/mengze/Desktop/yuanshi.txt'
     INTERVAL = 2
     POINT_ATTRIBUTE = [0, 1, 2, 3, 4]
 

@@ -640,10 +640,10 @@ if __name__ == '__main__':
     PAUSE: 检查中每段路显示暂停时间
     """
     print(sys.version)
-    DIR_IN = '/home/mengze/Desktop/GPS_yuebingcun_Sep15_03'
-    DIR_OUT = '/home/mengze/Desktop/6T3.55_GPS_yuebingcun_Sep15_03_out'
-    SAVE_TXT_POINTS = '/home/mengze/Desktop/GPS_yuebingcun_Sep15_03_points.txt'
-    SAVE_TXT_JUNCTIONS = '/home/mengze/Desktop/GPS_yuebingcun_Sep15_03_junctions.txt'
+    DIR_IN = '/home/mengze/Desktop/ys_Nov03'
+    DIR_OUT = '/home/mengze/Desktop/ys_Nov03_out'
+    SAVE_TXT_POINTS = '/home/mengze/Desktop/ys_Nov03_points.txt'
+    SAVE_TXT_JUNCTIONS = '/home/mengze/Desktop/ys_Nov03_junctions.txt'
     # [vel] m/s
     # {'id': 10001, 'type': 0}       0:"start_point" 1:"end_point"; 2:"way_point";
     # {'lonlat': [10024], 'type': 3} 3:"search"; 4:"scout_start"; 5:"scout_start"

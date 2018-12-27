@@ -58,8 +58,8 @@ def main():
 
 
 if __name__ == '__main__':
-    KML_FILE = '/home/mengze/Desktop/warehouse_Aug25.kml'
-    TXT_FILE = '/home/mengze/Desktop/warehouse_Aug25.txt'
+    KML_FILE = '/home/mengze/Desktop/test_Nov07.kml'
+    TXT_FILE = '/home/mengze/Desktop/test_Nov07.txt'
     OUTPUT = True
     INTERVAL = 2
     POINT_ATTRIBUTE = [0, 1, 2, 3, 4]

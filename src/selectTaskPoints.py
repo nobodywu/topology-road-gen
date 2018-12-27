@@ -20,28 +20,19 @@ def main():
     p2: 投影坐标系统\n
     TASK_POINTS: 需要设置的任务点，格式为id/属性 or 经纬度/属性
     """
-    SAVE_TXT_POINTS = '/home/mengze/Desktop/GPS_yuebingcun_Sep11_final02_points.txt'
-    SAVE_TXT_JUNCTIONS = '/home/mengze/Desktop/GPS_yuebingcun_Sep11_final02_junctions.txt'
-    SAVE_TASK = '/home/mengze/Desktop/TaskPoints_yuebingcun_Sep11_02.txt'
+    SAVE_TXT_POINTS = '/home/mengze/Desktop/test_Aug18/GPS_test_Aug18_points.txt'
+    SAVE_TXT_JUNCTIONS = '/home/mengze/Desktop/test_Aug18/GPS_test_Aug18_junctions.txt'
+    SAVE_TASK = '/home/mengze/Desktop/tk_ft_Nov02.txt'
     p1 = pyproj.Proj(init="epsg:4326")
     p2 = pyproj.Proj(init="epsg:3857")
     # {'id': 10001, 'type': 0}       0:"start_point" 1:"end_point"; 2:"way_point";
     # {'lonlat': [lon, lat], 'type': 3} 3:"search"; 4:"scout_start"; 5:"scout_start"
-    TASK_POINTS = [{'id': 2450011, 'type': 0}, {'id': 3960005, 'type': 2},
-                   {'id': 3950003, 'type': 2}, {'id': 3620002, 'type': 2},
-                   {'id': 3600036, 'type': 2}, {'id': 3320011, 'type': 2},
-                   {'id': 3000004, 'type': 2}, {'id': 2820003, 'type': 2},
-                   {'lonlat': [116.09991583, 40.15605410], 'type': 3},
-                   {'id': 860009, 'type': 2}, {'id': 2130005, 'type': 2},
-                   {'id': 1880007, 'type': 2},
-                   {'id': 1600017, 'type': 2}, {'id': 1530007, 'type': 2},
-                   {'id': 1000015, 'type': 2}, {'id': 560011, 'type': 2},
-                   {'id': 450032, 'type': 2}, {'id': 450006, 'type': 2},
-                   {'id': 970012, 'type': 2},
-                   {'id': 210005, 'type': 2}, {'id': 1720005, 'type': 2},
-
-                   {'id': 60003, 'type': 1}
-                   ]
+    TASK_POINTS = [{'id': 560143, 'type': 0}, {'id': 560048, 'type': 2},
+                   {'lonlat': [114.388617, 37.838506], 'type': 2}, {'id': 560039, 'type': 2},
+                   {'id': 560011, 'type': 2}, {'id': 560002, 'type': 2},
+                   {'id': 540030, 'type': 2}, {'id': 460003, 'type': 2},
+                   {'id': 220004, 'type': 2}, {'id': 150031, 'type': 2},
+                   {'id': 150003, 'type': 2}]
 
     points_all = np.loadtxt(SAVE_TXT_POINTS)
     points_junctions = np.loadtxt(SAVE_TXT_JUNCTIONS)
