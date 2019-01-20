@@ -668,8 +668,7 @@ if __name__ == '__main__':
 
     print(sys.version)
     # dir_in is a list, could have many dirs
-    dirs_in = ['/home/mengze/Desktop/test_in',
-               '/home/mengze/Desktop/test_in2']
+    dirs_in = ['/home/mengze/Desktop/test']
 
     vel_limit = {'num': 2, 'id': []}
     water = {'num': 2, 'id': []}

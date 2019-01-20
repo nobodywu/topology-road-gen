@@ -1,5 +1,3 @@
-# !/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import sys
 import os
 import shutil
@@ -9,13 +7,13 @@ from tkinter import messagebox as tm
 import numpy as np
 import pyproj
 import tkinter as tk
+import xml.dom.minidom
 import re
 import webbrowser
-import hashlib
-import time
-import subprocess
 import setJunctions as sj
-import showLink as sl
+
+# import random
+#
 
 
 class MakeFolder(tk.Toplevel):
@@ -49,95 +47,40 @@ class MakeFolder(tk.Toplevel):
 
     def openWs(self, dir_name):
 
-        if not dir_name:
-            tm.showinfo('提示', '请重新打开工作空间')
-            self.destroy()
-        else:
+        home = os.path.expanduser('~')
+        dir_path = os.path.join(home, 'Desktop', dir_name)
 
-            home = os.path.expanduser('~')
-            dir_path = os.path.join(home, 'Desktop', dir_name)
+        global ws_dir
+        global ws_dir_temp_seg
 
-            global ws_dir
-            global ws_dir_temp_seg
-            global ws_dir_seg
-            global file_config
+        ws_dir = dir_path
+        ws_dir_temp_seg = os.path.join(ws_dir, 'temp_seg')
 
-            ws_dir = dir_path
-            ws_dir_temp_seg = os.path.join(ws_dir, 'temp_seg')
-            ws_dir_seg = os.path.join(ws_dir, 'seg')
-            file_config = os.path.join(ws_dir, 'config.txt')
-
-            try:
-                # 工作空间是否存在
-                if not os.path.isdir(ws_dir):
-                    print('Making dir <%s>.' % ws_dir)
-                    os.mkdir(ws_dir)
-                else:
-                    print('Dir <%s> exist.' % ws_dir)
-                    text = '工作空间目录<%s>已存在' % ws_dir
-                    tm.showinfo('提示', text)
-
-                # 暂存路段的目录是否存在
-                if not os.path.isdir(ws_dir_temp_seg):
-                    print('Making dir <%s>.' % ws_dir_temp_seg)
-                    os.mkdir(ws_dir_temp_seg)
-                else:
-                    print('Dir <%s> exist.' % ws_dir_temp_seg)
-                    # text = '暂存路段目录<%s>已存在' % ws_dir_temp_seg
-                    # tm.showinfo('提示', text)
-
-                # 路段的目录是否存在
-                if not os.path.isdir(ws_dir_seg):
-                    print('Making dir <%s>.' % ws_dir_seg)
-                    os.mkdir(ws_dir_seg)
-                else:
-                    print('Dir <%s> exist.' % ws_dir_seg)
-
-                # config是否存在
-                if not os.path.isfile(file_config):
-                    print('Making file <%s>.' % file_config)
-                    self.write_config(file_config)
-                else:
-                    print('Amending <%s>.' % file_config)
-                    self.amend_config_time(file_config)
-
-                self.destory()
-                text = '工作空间<%s>已准备就绪' % dir_path
+        try:
+            if not os.path.isdir(ws_dir):
+                print('Making dir <%s>.' % ws_dir)
+                os.mkdir(ws_dir)
+            else:
+                print('Dir <%s> exist.' % ws_dir)
+                text = '工作空间目录<%s>已存在' % ws_dir
                 tm.showinfo('提示', text)
 
-            except:
-                print('Please enter an dir name')
-                tm.showinfo('提示', '进入工作空间失败\n请点击开始菜单-->创建/打开工作空间')
-                self.destory()
+            if not os.path.isdir(ws_dir_temp_seg):
+                print('Making dir <%s>.' % ws_dir_temp_seg)
+                os.mkdir(ws_dir_temp_seg)
+            else:
+                print('Dir <%s> exist.' % ws_dir_temp_seg)
+                text = '暂存路段目录<%s>已存在' % ws_dir_temp_seg
+                tm.showinfo('提示', text)
 
-    def write_config(self, file_name):
-        with open(file_name, 'w') as f:
-            text = []
-            localtime = time.asctime(time.localtime(time.time()))
-            line1 = '创建时间：' + localtime + '\n'
-            text.append(line1)
-            line2 = '访问时间：' + localtime + '\n'
-            text.append(line2)
-            line3 = 'KML文件MD5：未打开KML文件' + '\n'
-            text.append(line3)
-            line4 = 'KML文件路径：未打开KML文件' + '\n'
-            text.append(line4)
+            text = '工作空间<%s>已准备就绪' % dir_path
+            tm.showinfo('提示', text)
+            self.destory()
 
-            # Author information
-            text.append('\n**********************************\n')
-            info = '拓扑路网生成UI\n作者：NobodyWu\n邮箱：mengze.bit@gmail.com'
-            text.append(info)
-
-            f.writelines(text)
-
-    def amend_config_time(self, file_name):
-        with open(file_name, 'r+') as f:
-            text = f.readlines()
-            localtime = time.asctime(time.localtime(time.time()))
-            line2 = '访问时间：' + localtime + '\n'
-            text[1] = line2
-            f.seek(0, 0)
-            f.writelines(text)
+        except:
+            print('Please enter an dir name')
+            tm.showinfo('提示', '进入工作空间失败\n请点击开始菜单-->创建/打开工作空间')
+            self.destory()
 
 
 class HyperlinkMessageBox(tk.Toplevel):
@@ -206,8 +149,8 @@ class App(tk.Frame):
         self.menubar = tk.Menu(root)
         self.filemenu = tk.Menu(self.menubar, tearoff=False)
         self.filemenu.add_command(label="创建/打开工作空间", command=self.openWorkspace)
-        self.filemenu.add_command(label="打开kml文件", command=self.openFile)
-        self.filemenu.add_command(label="保存暂存路段", command=self.saveAllSeg)
+        self.filemenu.add_command(label="打开kml文件", command=self.getPoints)
+        self.filemenu.add_command(label="保存", command=self.saveAllSeg)
         self.menubar.add_cascade(label="文件", menu=self.filemenu)
 
         self.editmenu = tk.Menu(self.menubar, tearoff=False)
@@ -216,8 +159,7 @@ class App(tk.Frame):
         self.menubar.add_cascade(label="编辑", menu=self.editmenu)
 
         self.viewmenu = tk.Menu(self.menubar, tearoff=False)
-        self.viewmenu.add_command(label="重置视图", command=self.openFile)
-        self.viewmenu.add_command(label="检查路网", command=self.inspectRoad)
+        self.viewmenu.add_command(label="重置视图", command=self.initView)
         self.menubar.add_cascade(label="视图", menu=self.viewmenu)
 
         self.helpmenu = tk.Menu(self.menubar, tearoff=False)
@@ -232,9 +174,6 @@ class App(tk.Frame):
         self.openWorkspace()
 
     def initCanvas(self):
-        # 端点提示范围
-        self.radius = 14  # distance m
-        self.scalePC = 0
         # canvas
         # bisque, a pink to yellowish tan colour
         self.canvas = tk.Canvas(self, width=1200, height=800, background="white")
@@ -267,11 +206,14 @@ class App(tk.Frame):
 
     # menubar start
     def openWorkspace(self):
+
         MakeFolder(root, '创建/打开工作空间')
 
-    def openFile(self):
-
-        if 'ws_dir' not in globals():
+    def getPoints(self):
+        '''
+        读取文件中的点，每次读取文件之前首先初始化画布。
+        '''
+        if not ws_dir:
             self.openWorkspace()
         else:
             self.canvas.destroy()
@@ -281,115 +223,44 @@ class App(tk.Frame):
             self.itemSelected = []
             self.allSeg = []
             self.allSegItem = []
-            self.endPointsItemSelected = []
-            self.config_info = []
-            self.all_temp_seg_items = []
-            self.config_info = self.get_config(file_config)
-            self.canvas_scale = 1
+            try:
+                fileName = td.askopenfilename(
+                    filetypes=[("KML Files", ".kml"), ('All files', '*')])
+            except:
+                sys.exit()
 
-            # 如果config文件中有kml文件
-            if self.config_info:
-                ws_kml_file = self.config_info[1].strip()
-                self.getPointsOld(ws_kml_file)
-
+            if fileName:
+                print('File path <%s>.' % fileName)
+                cmd = 'cp %s %s' % (fileName, ws_dir)
+                os.system(cmd)
+                print('System: %s' % cmd)
+                self.points = parseKML(fileName)
+                self.showPoints(self.points)
+                self.onFileRead = True
             else:
-                self.getPoints()
-
-            # 如果有暂存的路段
-            path_list = getDocPaths(ws_dir_temp_seg)
-            if len(path_list):
-                end_items = self.get_temp_node_items(path_list)
-                for each in self.all_temp_seg_items:
-                    self.canvas.itemconfig((int(each),), fill='black', outline='black')
-                    self.canvas.tag_raise((int(each),))
-
-                for each in end_items:
-                    self.showEndPointRange((int(each),))  # no need return value
-
-    def get_temp_node_items(self, path_list):
-        self.all_temp_seg_items = []
-        end_items = []
-        for each in path_list:
-            nodes = np.loadtxt(each, skiprows=(1))
-            seg_items = nodes[:, 4]
-            self.all_temp_seg_items = np.concatenate((self.all_temp_seg_items, seg_items))
-            end_items.append(seg_items[0])
-            end_items.append(seg_items[-1])
-
-        return end_items
-
-    def getPointsOld(self, fileName):
-        print('File %s exist.' % fileName)
-
-        self.points = parseKML(fileName)
-        self.showPoints(self.points)
-        self.onFileRead = True
-
-    def getPoints(self):
-        '''
-        读取文件中的点，每次读取文件之前首先初始化画布。
-        '''
-        print('Choose a new kml file.')
-
-        try:
-            fileName = td.askopenfilename(
-                filetypes=[("KML Files", ".kml"), ('All files', '*')])
-        except:
-            sys.exit()
-
-        if fileName:
-            with open(fileName, 'rb') as f:
-                md5 = self.get_file_md5(f)
-
-            self.amend_config_md5(file_config, md5)
-
-            print('File path <%s>.' % fileName)
-            cmd = 'cp %s %s' % (fileName, ws_dir)
-            os.system(cmd)
-            print('System: %s' % cmd)
-
-            kml_file_name = os.path.basename(fileName)
-            kml_file_path = os.path.join(ws_dir, kml_file_name)
-            self.amend_config_path(file_config, kml_file_path)
-
-            self.points = parseKML(fileName)
-            self.showPoints(self.points)
-            self.onFileRead = True
-        else:
-            tm.showinfo('提示', '请选择一个kml文件')
+                tm.showinfo('提示', '请选择一个kml文件')
 
     def saveAllSeg(self):
         '''
         保存已暂存的所有路段，通过对话框制定文件目录和文件名，默认文件后缀为'.txt'。
         '''
-        if 'ws_dir' not in globals():
+        if not ws_dir:
             self.openWorkspace()
         else:
 
-            filePathList = getDocPaths(ws_dir_temp_seg)
-            if len(filePathList):
-                lastFile = filePathList[-1]
-                lastFileName = os.path.basename(lastFile)
-                lastNumber = int(lastFileName[:-4])
-                print('File: the last is %s.' % lastFileName)
-                i = lastNumber + 10000
-            else:
-                i = 10000
-
             try:
                 if len(self.allSeg):
-                    for seg in self.allSeg:
-                        fileName = str(i) + '.txt'
-                        filePath = os.path.join(ws_dir_temp_seg, fileName)
-                        writeTXT(filePath, seg)
-                        print('File <%s> generated.' % filePath)
-                        i = i + 10000
-
-                    text = '暂存的路段文件已保存在目录 <%s> 下，\n本次保存%d个路段。' \
-                        % (ws_dir_temp_seg, len(self.allSeg))
-                    tm.showinfo('提示', text)
-                    self.allSeg = []
-
+                    fileName = td.asksaveasfilename(defaultextension='.kml',
+                                                    filetypes=[('All files', '*')])
+                    print(fileName)
+                    onWriteFile = writeFile(fileName, self.allSeg)
+                    if onWriteFile:
+                        text = 'File <%s> saved, include %d segments.' % (
+                            fileName, len(self.allSeg))
+                        tm.showinfo('提示', text)
+                        self.allSeg = []
+                    else:
+                        tm.showinfo('提示', '请检查文件格式')
                 else:
                     tm.showinfo('提示', '没有暂存的路段')
 
@@ -401,7 +272,7 @@ class App(tk.Frame):
         '''
         删除上一段路，每次删除一段。当前焦点需要在画布上。
         '''
-        if 'ws_dir' not in globals():
+        if not ws_dir:
             self.openWorkspace()
         else:
 
@@ -412,42 +283,35 @@ class App(tk.Frame):
                 items = self.allSegItem.pop()
                 print(items)
                 for item in items:
-                    # 如果点以保存的暂存路段temp_seg中变为黑色，否则变为红色
-                    if item in self.all_temp_seg_items:
-                        self.canvas.itemconfig(item, fill='black', outline='black')
-                        self.canvas.tag_raise(item)
-                    else:
-                        self.canvas.itemconfig(item, fill='red', outline='red')
-
-                # delete end points
-                item1 = self.endPointsItemSelected.pop()
-                item2 = self.endPointsItemSelected.pop()
-                self.canvas.delete(item1)
-                self.canvas.delete(item2)
+                    self.canvas.itemconfig(item, fill='red', outline='red')
 
                 print('removed last segment')
                 print('remain %d, %d segments.' % (len(self.allSeg), len(self.allSegItem)))
             else:
                 tm.showinfo('提示', '没有暂存路段')
 
-    def inspectRoad(self):
-        if 'ws_dir' not in globals():
-            self.openWorkspace()
-        else:
-            ws_dirs = [ws_dir, ws_dir_temp_seg, ws_dir_seg]
-            sl.inspect(ws_dirs)
-
     def genTopologyRoad(self):
-        if 'ws_dir' not in globals():
+        if not ws_dir:
             self.openWorkspace()
         else:
-            print('source path <%s>' % ws_dir_temp_seg)
-            print('target path <%s>' % ws_dir_seg)
-            shutil.rmtree(ws_dir_seg)
-            os.mkdir(ws_dir_seg)
+            sourcePath = td.askdirectory(title="Pick a source folder")
+            print('source path <%s>' % sourcePath)
+            targetPath = td.askdirectory(title="Pick a target folder")
+            print('target path <%s>' % targetPath)
+            shutil.rmtree(targetPath)
+            os.mkdir(targetPath)
+            writeTopologyRoad(sourcePath, targetPath)
 
-            ws_dirs = [ws_dir, ws_dir_temp_seg, ws_dir_seg]
-            sj.genRoad(ws_dirs)
+    # menubar view
+    def initView(self):
+        self.canvas.destroy()
+        self.initCanvas()
+        if self.onFileRead:
+            self.showPoints(self.points)
+        else:
+            print('Please open a kml file.')
+
+    # menubar help
 
     def helpMSG(self):
         self.helpMSG = HyperlinkMessageBox(
@@ -471,12 +335,7 @@ class App(tk.Frame):
         # self.canvas.focus_lastfor()
         if len(self.itemSelected):
             item = self.itemSelected.pop()
-            # 如果点以保存的暂存路段temp_seg中变为黑色，否则变为红色
-            if item in self.all_temp_seg_items:
-                self.canvas.itemconfig(item, fill='black', outline='black')
-                self.canvas.tag_raise(item)
-            else:
-                self.canvas.itemconfig(item, fill='red', outline='red')
+            self.canvas.itemconfig(item, fill='red', outline='red')
             # print(self.itemSelected)
             # print('deleted last point')
         else:
@@ -489,45 +348,21 @@ class App(tk.Frame):
         segment = []
         self.canvas.focus_set()
         # self.canvas.focus_lastfor()
-        if len(self.itemSelected) >= 3:
+        if len(self.itemSelected):
             for item in self.itemSelected:
-                itemPoint = self.points[item[0] - 1]
-                itemPoint.append(item[0])
-                segment.append(itemPoint)  # item start from 1
+                segment.append(self.points[item[0] - 1])  # item start from 1
                 self.canvas.itemconfig(item, fill='green', outline='green')
 
             self.allSeg.append(segment)
             self.allSegItem.append(self.itemSelected)  # 为了知道每段点的tags or id，在删除时更改颜色
-            # print(self.allSeg)
-            # print('%d, %d segments' % (len(self.allSeg), len(self.allSegItem)))
-
-            # show segment end points range, selected seg
-            item1 = self.showEndPointRange(self.itemSelected[0])
-            item2 = self.showEndPointRange(self.itemSelected[-1])
-            self.endPointsItemSelected.append(item1)
-            self.endPointsItemSelected.append(item2)
-
-            print('new item', item1, item2)
-
-            print('%d segment appended' % len(self.allSeg))
+            print(self.allSeg)
+            print('%d, %d segments' % (len(self.allSeg), len(self.allSegItem)))
+            print('segment appended')
             text = '已确认%d段路' % len(self.allSeg)
             tm.showinfo('提示', text)
             self.itemSelected = []
         else:
-            tm.showinfo('提示', '路点数量小于3')
-
-    def showEndPointRange(self, item):
-        # use item to calc position, creat a dash circle, return new object item
-        x0, y0, x1, y1 = self.canvas.coords(item)
-        posX = (x1 + x0) / 2
-        posY = (y1 + y0) / 2
-        rScale = self.radius * self.canvas_scale / self.scalePC
-
-        # stay original size when zoomerM or zoomerP
-        item_new = self.canvas.create_oval(posX - rScale, posY - rScale,
-                                           posX + rScale, posY + rScale, dash=(5, 5))
-
-        return item_new
+            tm.showinfo('提示', '请选择路点')
 
     def selectObject(self, event):
         '''
@@ -538,18 +373,12 @@ class App(tk.Frame):
         true_y = self.canvas.canvasy(event.y)
         item = self.canvas.find_closest(true_x, true_y)
         # item start from 1, python lists start from 0, item structure: (n,)
-        if item[0] <= len(self.points):
-            print(item[0])
-            print(item[0], self.points[item[0] - 1])
-            currentColor = self.canvas.itemcget(item, 'fill')
-            # 红色：未选中 绿色：已暂存 黑色：打开工作空间时显示temp_seg路段中的点
-            if (currentColor == 'red') | (currentColor == 'green') | (currentColor == 'black'):
-                self.canvas.itemconfig(item, fill='#2F4F4F', outline='#2F4F4F')  # 墨绿色
-                self.canvas.tag_raise(item)
-                self.itemSelected.append(item)
-                print(self.itemSelected)  # for item in itemSelected: points[item[0]]
-        else:
-            tm.showinfo('提示', '请将鼠标靠近路点，远离虚线范围提示框')
+        print(item[0], self.points[item[0] - 1])
+        currentColor = self.canvas.itemcget(item, 'fill')
+        if (currentColor == 'red') | (currentColor == 'green'):
+            self.canvas.itemconfig(item, fill='black', outline='black')
+            self.itemSelected.append(item)
+            print(self.itemSelected)  # for item in itemSelected: points[item[0]]
 
     # move
     def moveStart(self, event):
@@ -565,8 +394,6 @@ class App(tk.Frame):
             true_x = self.canvas.canvasx(event.x)
             true_y = self.canvas.canvasy(event.y)
             self.canvas.scale("all", true_x, true_y, 1.1, 1.1)
-            self.canvas_scale = self.canvas_scale * 1.1
-            # print(self.canvas_scale)
             # enlarge scroll area
             x0, y0, x1, y1 = self.canvas.bbox("all")
             self.canvas.configure(scrollregion=[x0 - 200, y0 - 200, x1 + 200, y1 + 200])
@@ -579,12 +406,9 @@ class App(tk.Frame):
             true_x = self.canvas.canvasx(event.x)
             true_y = self.canvas.canvasy(event.y)
             self.canvas.scale("all", true_x, true_y, 0.9, 0.9)
-            self.canvas_scale = self.canvas_scale * 0.9
-            # print(self.canvas_scale)
             # x0, y0, x1, y1 = self.canvas.bbox("all")
             self.canvas.configure(scrollregion=self.canvas.bbox("all"))
             self.reshowPoints()
-
         else:
             print('Please open a kml file.')
 
@@ -599,6 +423,7 @@ class App(tk.Frame):
             posX = (x1 + x0) / 2
             posY = (y1 + y0) / 2
             self.canvas.coords(i + 1, posX - 4, posY - 4, posX + 4, posY + 4)
+        pass
 
     def showPoints(self, points):
         '''
@@ -611,69 +436,27 @@ class App(tk.Frame):
         xRange = pointsRangePCS[1] - pointsRangePCS[0]
         yRange = pointsRangePCS[3] - pointsRangePCS[2]
 
-        print('Points xyRange: ', xRange, yRange)
-        print('Canvas xyRange: ', 1200, 800)
         xRatio = xRange / 1200
         yRatio = yRange / 800
 
-        print('xyRatio: ', xRatio, yRatio)
-
         if xRatio <= yRatio:
-            self.scalePC = yRatio
+            scale = yRatio
         else:
-            self.scalePC = xRatio
+            scale = xRatio
 
-        print('max(Points xyR / Canvas xyR) = scalePC: ', self.scalePC)
         for i in range(pointsPCS.shape[0]):
+            # print(i)
 
-            posX = (pointsPCS[i, 0] - pointsRangePCS[0]) / self.scalePC
+            # posX = (pointsPCS[i, 0] - pointsRangePCS[0]) * xyscale / xRange
             # reverse y-axis
-            posY = 800 - (pointsPCS[i, 1] - pointsRangePCS[2]) / self.scalePC
+            # posY = (1 - (pointsPCS[i, 1] - pointsRangePCS[2]) / yRange) * xyscale
+
+            posX = (pointsPCS[i, 0] - pointsRangePCS[0]) / scale
+            # reverse y-axis
+            posY = 800 - (pointsPCS[i, 1] - pointsRangePCS[2]) / scale
 
             self.canvas.create_oval(posX - 4, posY - 4, posX + 4, posY + 4,
                                     fill='red', outline='red', tags=i + 1)  # item start from 1
-
-    def get_file_md5(self, f):
-        m = hashlib.md5()
-        while True:
-            # 如果不用二进制打开文件，则需要先编码
-            # data = f.read(1024).encode('utf-8')
-            data = f.read(1024)  # 为避免文件过大分块读取
-            if not data:
-                break
-            m.update(data)
-        return m.hexdigest()
-
-    def amend_config_md5(self, file_config, md5):
-        with open(file_config, 'r+') as f:
-            text = f.readlines()
-            line3 = 'KML文件MD5：' + md5 + '\n'
-            text[2] = line3
-            f.seek(0, 0)
-            f.writelines(text)
-
-    def amend_config_path(self, file_config, file_kml):
-        with open(file_config, 'r+') as f:
-            text = f.readlines()
-            line4 = 'KML文件路径：' + file_kml + '\n'
-            text[3] = line4
-            f.seek(0, 0)
-            f.writelines(text)
-
-    def get_config(self, file_config):
-        with open(file_config, 'r') as f:
-            text = f.readlines()
-            line3 = text[2]
-            config_md5 = line3[9:]
-            line4 = text[3]
-            kml_path = line4[8:]
-
-        if config_md5 == '未打开KML文件\n' and kml_path == '未打开KML文件\n':
-            config_info = []
-            return config_info
-        else:
-            config_info = [config_md5, kml_path]
-            return config_md5, kml_path
 
 
 def parseKML(file):
@@ -731,63 +514,137 @@ def getPointsRange(pointsPCS):
     return [xyzmin[0], xyzmax[0], xyzmin[1], xyzmax[1], xyzmin[2], xyzmax[2]]
 
 
-def writeTXT(fileName, seg):
+def writeFile(fileName, allSeg):
     '''
     保存已暂存的所有路段。
     allSeg = [seg1, seg2, seg3, ...]
     eachSeg = [point1, point2, point3, ...]
     eachPoint = [lon, lat, alt]
     '''
+    acronym = os.path.splitext(fileName)
+    print(acronym[-1])
+    if acronym[-1] == '.txt':
+        writeTXT(fileName, allSeg)
+        return True
+        print('File <%s> saved, include %d segments.' % (fileName, len(allSeg)))
+    elif acronym[-1] == '.kml':
+        writeKML(fileName, allSeg)
+        print('File <%s> saved, include %d segments.' % (fileName, len(allSeg)))
+        return True
 
-    i = 1  # line number
+    return False
+
+
+def writeTXT(fileName, allSeg):
+    i = 1  # 每段路点的个数
     with open(fileName, 'w') as f:
-        f.write('num lon lat alt item\n')  # 'item' used for showing point in canvas
+        for seg in allSeg:
+            f.write('***********\n')
 
-        for point in seg:
-            line = str(i) + ' ' + str(point[0]) + ' ' + \
-                str(point[1]) + ' ' + str(point[2]) + ' ' + str(point[3]) + '\n'
-            f.write(line)
-            i += 1
+            for point in seg:
+                line = str(i) + ' ' + str(point[0]) + ' ' + \
+                    str(point[1]) + ' ' + str(point[2]) + '\n'
+                f.write(line)
+                i += 1
 
-        i = 1
+            i = 1
 
 
-def getDocPaths(dir_name):
-    filepathList = []
+def writeKML(fileName, allSeg):
+    filePath = os.path.dirname(fileName)
+    shutil.rmtree(filePath)
+    os.mkdir(filePath)
+    print(filePath)
+    i = 10000  # 表示文件名
+    print(len(allSeg))
+    for seg in allSeg:
+        name = os.path.join(filePath, str(i) + '.xml')
+        print(name)
+        doc = xml.dom.minidom.Document()
+        doc.appendChild(doc.createComment("Generated by python3.x, Author: Mengze."))
+        osmNode = doc.createElement("osm")
+        doc.appendChild(osmNode)
+        ids = addNode(doc, osmNode, seg, i)
+        addWay(doc, osmNode, ids, i)
+        with open(name, 'w') as f:
+            doc.writexml(f, addindent="    ", newl="\n", encoding="UTF-8")
 
-    for maindir, subdir, fileListStr in os.walk(dir_name):
-        fileList = []
-        for each in fileListStr:
+        print('File <%s> saved!' % name)
+
+        i += 10000
+
+
+def addNode(doc, osmNode, seg, i):
+    ids = []
+    ii = i + 1  # 表示这段路上的点序号
+    for point in seg:
+        lon = '%.8f' % point[0]
+        lat = '%.8f' % point[1]
+        alt = '%d' % point[2]
+        nodeID = '%d' % ii
+        pointNode = doc.createElement("node")
+        pointNode.setAttribute('id', nodeID)
+        pointNode.setAttribute('lon', lon)
+        pointNode.setAttribute('lat', lat)
+        pointNode.setAttribute('alt', alt)
+        osmNode.appendChild(pointNode)
+        ids.append(ii)
+
+        ii += 1
+
+    return ids
+
+
+def addWay(doc, osmNode, ids, i):
+    wayNode = doc.createElement("way")
+    wayNode.setAttribute('id', str(i))
+    osmNode.appendChild(wayNode)
+
+    for each in ids:
+        ndtNode = doc.createElement("nd")
+        ndtNode.setAttribute('ref', str(each))
+        wayNode.appendChild(ndtNode)
+
+    way_tagNode = doc.createElement("tag")
+    way_tagNode.setAttribute('k', "name:en")
+    way_tagNode.setAttribute('v', "double way")
+
+    wayNode.appendChild(way_tagNode)
+
+
+def writeTopologyRoad(sourcePath, targetPath):
+    try:
+        sj.main(sourcePath, targetPath)
+    except:
+        text = '请检查目录<%s>下的xml文件' % sourcePath
+        tm.showinfo('提示', text)
+
+
+def get_doc_paths(dir_name):
+    filepath_list = []
+
+    for maindir, subdir, file_list_str in os.walk(dir_name):
+        file_list = []
+        for each in file_list_str:
             try:
                 file_number = int(each[:-4])
-                fileList.append(file_number)
+                file_list.append(file_number)
             except:
                 print('Ignore <%s>' % each)
 
-        for each in sorted(fileList):
-            filename = str(each) + '.txt'
+        for each in sorted(file_list):
+            filename = str(each) + '.xml'
             filepath = os.path.join(maindir, filename)
-            filepathList.append(filepath)
+            filepath_list.append(filepath)
 
-    print("Dir <%s> has %d files." % (maindir, len(filepathList)))
+    print("Dir <%s> has %d XML files." % (maindir, len(filepath_list)))
 
-    return filepathList
+    return filepath_list
 
 
 if __name__ == "__main__":
-    root_win_name = '创建拓扑路网'
-
-    cmd = 'wmctrl -lG | grep \'' + root_win_name + '\' | awk \'{print $1}\''
-    win_id = subprocess.check_output(["/bin/bash", "-c", cmd]).decode("utf-8")
-    win_id = win_id.split()
-    if len(win_id):
-        print('Close former process, id: ', win_id)
-        for each in win_id:
-            cmd = 'wmctrl -ic ' + each
-            os.system(cmd)
-
     root = tk.Tk()
-    root.title(root_win_name)
+    root.title('Select Segment')
     # root.iconbitmap(r'full path name')
     App(root).pack(fill="both", expand=1)  # fill 控件的填充方向 expand 控件随着窗口的控件填充
     root.mainloop()

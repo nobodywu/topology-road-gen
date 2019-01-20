@@ -3,99 +3,93 @@
 import os
 import xml.dom.minidom
 import numpy as np
-import seaborn
-import matplotlib.pyplot as plt
 import pyproj
 import sys
-import copy
 
 
-def findAllPath(dir_name):
-    print("******Finding files ******")
-    for maindir, subdir, file_list_str in os.walk(dir_name):
-        file_list = []
-        for each in file_list_str:
+class Config:
+
+    def __init__(self, ws_dirs):
+        self.ws_dirs = ws_dirs
+        self.dir_in = self.ws_dirs[1]
+        self.dir_out = self.ws_dirs[2]
+        self.file_points = os.path.join(self.ws_dirs[0], 'points.txt')
+        self.file_junctions = os.path.join(self.ws_dirs[0], 'junctions.txt')
+
+        self.dis_delta = 15  # self.radius = 14m
+
+
+def getDocPaths(dir_name):
+    # txt file
+
+    filepathList = []
+
+    for maindir, subdir, fileListStr in os.walk(dir_name):
+        fileList = []
+        for each in fileListStr:
             try:
                 file_number = int(each[:-4])
-                file_list.append(file_number)
+                fileList.append(file_number)
             except:
                 print('Ignore <%s>' % each)
 
-        filepath_list = []
-        for each in sorted(file_list):
-            filename = str(each) + '.xml'
+        for each in sorted(fileList):
+            filename = str(each) + '.txt'
             filepath = os.path.join(maindir, filename)
-            filepath_list.append(filepath)
+            filepathList.append(filepath)
 
-    print("Dir <%s> has %d XML files." % (maindir, len(filepath_list)))
+    print("Dir <%s> has %d files." % (maindir, len(filepathList)))
 
-    return filepath_list
-
-
-def parseXML(filepath, count, MAX, p1, p2):
-    print("******Parsing <%s>******" % filepath)
-    points = []
-    DOMTree = xml.dom.minidom.parse(filepath)
-    collection = DOMTree.documentElement
-    if collection.getElementsByTagName('node'):
-        nodes = collection.getElementsByTagName('node')
-
-        for node in nodes:
-            lon = node.getAttribute("lon")
-            lat = node.getAttribute("lat")
-            point_id = node.getAttribute("id")
-            point = [float(lon), float(lat), int(point_id)]
-            point[0], point[1] = pyproj.transform(p1, p2, point[0], point[1])
-            points.append(point)
-
-    else:
-        print("Empty file, no node.")
-
-    if collection.getElementsByTagName('way'):
-        ways = collection.getElementsByTagName('way')
-
-        if len(ways) == 1:
-            for way in ways:
-                way_id = int(way.getAttribute('id'))
-        else:
-            print("Error: mutiple way_id.")
-    else:
-        print("Error: no elements <way>.")
-
-    if not len(points):
-        count += 1
-
-    way_id -= count * MAX
-    for each in points:
-        each[2] -= count * MAX
-
-    return points, way_id, count
+    return filepathList
 
 
-def setIntersection(points, points_stack, way_id, DIS_DELTA):
+def get_temp_seg(path_list):
+    # 读取暂存路段中的点并进行坐标转换，转换到投影坐标系中
+    p1 = pyproj.Proj(init="epsg:4326")
+    p2 = pyproj.Proj(init="epsg:3857")
+    way_id = 10000
+    points_all_segs = []
+    for each_path in path_list:
+        points = np.loadtxt(each_path, skiprows=(1), dtype={'names': ('num', 'lon', 'lat', 'alt', 'item'),
+                                                            'formats': (int, float, float, float, int)})
+        i = 1
+        points_seg = []
+        for point in points:
+            x, y = pyproj.transform(p1, p2, point[1], point[2])
+            point_id = way_id + i
+            point_PCS = [x, y, point_id]
+            points_seg.append(point_PCS)
+            i = i + 1
+
+        points_all_segs.append(points_seg)
+        way_id = way_id + 10000
+
+    return points_all_segs
+
+
+def setIntersection(points, points_stack, way_id, dis_delta):
+
     print('******Setting junction point. Way id: %d******' % way_id)
 
     shape = points_stack.shape
-    if points:
-        if not shape[0]:
-            points_stack = np.vstack([points[0], points[-1]])
-            print('First way, set two junction points')
-        else:
-            points_stack, point = stackPoint(
-                points[0], points_stack, DIS_DELTA, index_str='First point')
-            points[0] = point
-            points_stack, point = stackPoint(
-                points[-1], points_stack, DIS_DELTA, index_str='Last point')
-            points[-1] = point
 
+    if not shape[0]:
+        points_stack = np.vstack([points[0], points[-1]])
+        print('First way, set two junction points')
     else:
-        print('no points.')
+        points_stack, point = stackPoint(
+            points[0], points_stack, dis_delta, index_str='First point')
+        points[0] = point
+        points_stack, point = stackPoint(
+            points[-1], points_stack, dis_delta, index_str='Last point')
+        points[-1] = point
 
     # print(points_stack.shape)
     return points, points_stack
 
 
 def calcDis(point, points_stack):
+
     lon_delta = np.subtract(point[0], points_stack[:, 0])
     lat_delta = np.subtract(point[1], points_stack[:, 1])
     dis = np.sqrt(np.multiply(lon_delta, lon_delta) + np.multiply(lat_delta, lat_delta))
@@ -104,17 +98,18 @@ def calcDis(point, points_stack):
     return np.hstack([points_stack, dis])
 
 
-def stackPoint(point, points_stack, DIS_DELTA, index_str=''):
+def stackPoint(point, points_stack, dis_delta, index_str=''):
+
     points_stack_dis = calcDis(point, points_stack)
     # print(points_stack_dis)
     point_stack_dis_min = points_stack_dis.min(axis=0)
-    # print(point_stack_dis_min)
+    # print(point_stack_dis_min.shape)
     index = np.argwhere(points_stack_dis == point_stack_dis_min[-1])
     row = index[0][0]
     col = index[0][1]
     # print(row, col)
 
-    if abs(point_stack_dis_min[-1]) < DIS_DELTA:
+    if abs(point_stack_dis_min[-1]) < dis_delta:
         point_lon = points_stack_dis[row, 0]
         point_lat = points_stack_dis[row, 1]
         point_id = points_stack_dis[row, col - 1]
@@ -128,33 +123,21 @@ def stackPoint(point, points_stack, DIS_DELTA, index_str=''):
     return points_stack, point
 
 
-def writeXML(points, way_id, NODE_ATTR, SET_VEL_LIMIT, limit_points, OTHER_ATTR, other_attr_points, DIR_OUT, p2, p1):
-    print('******Writing XML******')
+def writeXML(points, way_id, config):
+
+    print('Writing XML')
+    p1 = pyproj.Proj(init="epsg:4326")
+    p2 = pyproj.Proj(init="epsg:3857")
 
     doc = xml.dom.minidom.Document()
     doc.appendChild(doc.createComment("Generated by python, Author: Mengze."))
     osmNode = doc.createElement("osm")
     doc.appendChild(osmNode)
 
-    # water_id
-    water_id = findAttrID(points, OTHER_ATTR[0])
-    # smoke_id
-    smoke_id = findAttrID(points, OTHER_ATTR[1])
-    # dyn_ob_id
-    dyn_ob_id = findAttrID(points, OTHER_ATTR[2])
-    # concave_ob_id
-    concave_ob_id = findAttrID(points, OTHER_ATTR[3])
+    addNode(doc, osmNode, points, p1, p2)
+    addWay(doc, osmNode, points, way_id, p1, p2)
 
-    attr_id_all = [water_id, smoke_id, dyn_ob_id, concave_ob_id]
-
-    # vel limit id
-    limit_id = findLimitID(points, SET_VEL_LIMIT)
-
-    limit_points, other_attr_points = addNode(
-        doc, osmNode, points, NODE_ATTR, limit_id, limit_points, attr_id_all, other_attr_points, p2, p1)
-    addWay(doc, osmNode, points, way_id, p2, p1)
-
-    file_name = '%s/%d.xml' % (DIR_OUT, way_id)
+    file_name = '%s/%d.xml' % (config.dir_out, way_id)
     print(file_name)
 
     with open(file_name, 'w') as f:
@@ -162,73 +145,9 @@ def writeXML(points, way_id, NODE_ATTR, SET_VEL_LIMIT, limit_points, OTHER_ATTR,
 
     print('Done!')
 
-    return limit_points, other_attr_points
 
+def addNode(doc, osmNode, points, p1, p2):
 
-def findAttrID(points, EACH_ATTR):
-    attr_id = np.empty(shape=[0, ])
-    lenth = len(points)
-    points_arr = np.array(points)
-    pos = EACH_ATTR['num'] + 1
-    each_attr_points_id = EACH_ATTR['id']
-
-    for each in each_attr_points_id:
-        find = points_arr[:, 2] == each
-        if find.any():  # 如果匹配到id
-            attr_point_id = points_arr[points_arr[:, 2] == each][0, 2]
-            attr_point_index = np.argwhere(points_arr == attr_point_id)[0, 0]
-            if attr_point_index < pos:
-                attr_id = np.concatenate([attr_id, points_arr[:attr_point_index, 2]])
-                attr_id = np.concatenate(
-                    [attr_id, points_arr[attr_point_index:attr_point_index + pos, 2]])
-            elif lenth - attr_point_index - 1 < pos:
-                attr_id = np.concatenate([attr_id, points_arr[attr_point_index:, 2]])
-                attr_id = np.concatenate(
-                    [attr_id, points_arr[attr_point_index - pos + 1:attr_point_index, 2]])
-            else:
-                attr_id = np.concatenate(
-                    [attr_id, points_arr[attr_point_index - pos + 1:attr_point_index + pos, 2]])
-
-    print('Attr point id:{0}'.format(attr_id))
-    return attr_id
-
-
-def findLimitID(points, SET_VEL_LIMIT):
-    limit_id = np.empty(shape=[0, ])
-
-    lenth = len(points)
-    points_arr = np.array(points)
-    pos = SET_VEL_LIMIT['num'] + 1
-    set_limit_points_id = SET_VEL_LIMIT['id']
-
-    if lenth <= SET_VEL_LIMIT['num'] * 2 + 1:  # 每段路上点的数量 <= num*2 + 1，取所有点
-        limit_id = points_arr[:, 2]
-    else:  # >= num*2 + 1，取每段两端的点，查找限制速度的id
-        limit_id = points_arr[0:pos, 2]
-        limit_id = np.concatenate([limit_id, points_arr[-pos:, 2]])
-        for each in set_limit_points_id:
-            find = points_arr[:, 2] == each
-            if find.any():  # 如果匹配到id
-                limit_point_id = points_arr[points_arr[:, 2] == each][0, 2]
-                limit_point_index = np.argwhere(points_arr == limit_point_id)[0, 0]
-                if limit_point_index < pos:  # 在开头
-                    limit_id = np.concatenate([limit_id, points_arr[:limit_point_index, 2]])
-                    limit_id = np.concatenate(
-                        [limit_id, points_arr[limit_point_index:limit_point_index + pos, 2]])
-                elif lenth - limit_point_index - 1 < pos:  # 在结尾
-                    limit_id = np.concatenate([limit_id, points_arr[limit_point_index:, 2]])
-                    limit_id = np.concatenate(
-                        [limit_id, points_arr[limit_point_index - pos + 1:limit_point_index, 2]])
-                else:  # 在中间
-                    limit_id = np.concatenate(
-                        [limit_id, points_arr[limit_point_index - pos + 1:limit_point_index + pos, 2]])
-
-    print('Vel limit point id:{0}'.format(limit_id))
-
-    return limit_id
-
-
-def addNode(doc, osmNode, points, NODE_ATTR, limit_id, limit_points, attr_id_all, other_attr_points, p2, p1):
     count = 0
     for point in points:
         point[0], point[1] = pyproj.transform(p2, p1, point[0], point[1])
@@ -240,64 +159,12 @@ def addNode(doc, osmNode, points, NODE_ATTR, limit_id, limit_points, attr_id_all
         pointNode.setAttribute('id', point_id)
         pointNode.setAttribute('lat', lat)
         pointNode.setAttribute('lon', lon)
-        find = limit_id == point[2]
-        point[0], point[1] = pyproj.transform(p1, p2, point[0], point[1])
-
-        # vel limit
-        if find.any():
-            limit_points.append(copy.deepcopy(point))
-            pointNode.setAttribute('vel', NODE_ATTR['vel'][0])
-        else:
-            pointNode.setAttribute('vel', NODE_ATTR['vel'][1])
-
-        # water
-        find_water = attr_id_all[0] == point[2]
-        if find_water.any():
-            other_attr_points[0].append(copy.deepcopy(point))
-            pointNode.setAttribute('water', '1')
-        else:
-            pointNode.setAttribute('water', '0')
-
-        # smoke
-        find_smoke = attr_id_all[1] == point[2]
-        if find_smoke.any():
-            other_attr_points[1].append(copy.deepcopy(point))
-            pointNode.setAttribute('smoke', '1')
-        else:
-            pointNode.setAttribute('smoke', '0')
-
-        # dyn_ob
-        find_dyn_ob = attr_id_all[2] == point[2]
-        if find_dyn_ob.any():
-            other_attr_points[2].append(copy.deepcopy(point))
-            pointNode.setAttribute('dyn_ob', '1')
-        else:
-            pointNode.setAttribute('dyn_ob', '0')
-
-        # concave_ob
-        find_concave_ob = attr_id_all[3] == point[2]
-        if find_concave_ob.any():
-            other_attr_points[3].append(copy.deepcopy(point))
-            pointNode.setAttribute('concave_ob', '1')
-        else:
-            pointNode.setAttribute('concave_ob', '0')
-
-        # NODE_ATTR['type'][3]='-3'
-        if (count == 1) | (count == len(points)):
-            pointNode.setAttribute('type', NODE_ATTR['type'][-1])
-            point_tagNode = doc.createElement("tag")
-            point_tagNode.setAttribute('k', "highway")
-            point_tagNode.setAttribute('v', "traffic_signals")
-            pointNode.appendChild(point_tagNode)
-        else:
-            pointNode.setAttribute('type', NODE_ATTR['type'][-1])
 
         osmNode.appendChild(pointNode)
 
-    return limit_points, other_attr_points
 
+def addWay(doc, osmNode, points, way_id, p1, p2):
 
-def addWay(doc, osmNode, points, way_id, p2, p1):
     way_id_str = '%d' % way_id
     wayNode = doc.createElement("way")
     wayNode.setAttribute('id', way_id_str)
@@ -317,233 +184,52 @@ def addWay(doc, osmNode, points, way_id, p2, p1):
     wayNode.appendChild(way_tagNode)
 
 
-def showInspect(points_stack, all_seg, points_all, PAUSE):
+def saveData(points_all, points_stack, dir_points, dir_junctions):
+    p1 = pyproj.Proj(init="epsg:4326")
+    p2 = pyproj.Proj(init="epsg:3857")
 
-    for junction_point in points_stack:
-        relevant_seg = np.empty(shape=[0, 3])
-
-        for seg in all_seg:
-            seg = np.array(seg)
-            first = junction_point[2] == seg[0][2]
-            last = junction_point[2] == seg[-1][2]
-
-            if first | last:
-                relevant_seg = np.vstack([relevant_seg, seg])
-
-        range_PCS = calcRange(relevant_seg)
-
-        set_xylim(range_PCS)
-        plt.pause(PAUSE)
-        plt.scatter(relevant_seg[:, 0], relevant_seg[:, 1], c='g', marker='.')
-        plt.scatter(points_stack[:, 0], points_stack[:, 1], c='k', marker='o')
-        plt.scatter(junction_point[0], junction_point[1], c='b', marker='o')
-        plt.pause(PAUSE * 2)
-        plt.clf()
-        # plt.axis('equal')
-        set_xylim(range_PCS)
-        plt.scatter(points_all[:, 0], points_all[:, 1], c='r', marker='.')
-        plt.scatter(points_stack[:, 0], points_stack[:, 1], c='k', marker='o')
-        plt.pause(PAUSE * 2)
-
-
-def showAnimate(points_stack, points_all, PAUSE, range_PCS):
-    set_xylim(range_PCS)
-    plt.pause(PAUSE)
-    # plt.scatter(points_all[:, 0], points_all[:, 1], c='r', marker='o')
-    plt.scatter(points_stack[:, 0], points_stack[:, 1], c='k', marker='o')
-    plt.pause(PAUSE)
-
-    plt.clf()
-    # plt.axis('equal')
-    set_xylim(range_PCS)
-    plt.scatter(points_all[:, 0], points_all[:, 1], c='r', marker='.')
-    plt.scatter(points_stack[:, 0], points_stack[:, 1], c='k', marker='o')
-    plt.pause(PAUSE)
-
-
-def showAttr(points_stack, points_all, points):
-    points_arr = np.array(points)
-    plt.scatter(points_all[:, 0], points_all[:, 1], c='r', marker='.')
-    if points:
-        plt.scatter(points_arr[:, 0], points_arr[:, 1], c='b', marker='.')
-    plt.scatter(points_stack[:, 0], points_stack[:, 1], c='k', marker='o')
-    plt.axis('equal')
-
-
-def set_xylim(range_PCS):
-    range_xscale = range_PCS[1] - range_PCS[0]
-    range_xmid = (range_PCS[1] + range_PCS[0]) / 2
-    range_yscale = (range_PCS[3] - range_PCS[2])
-    range_ymid = (range_PCS[3] + range_PCS[2]) / 2
-
-    if range_xscale >= range_yscale:
-        plt.xlim((range_xmid - range_xscale * 2, range_xmid + range_xscale * 2))
-        plt.ylim((range_ymid - range_xscale, range_ymid + range_xscale))
-    else:
-
-        plt.ylim((range_ymid - range_yscale, range_ymid + range_yscale))
-        plt.xlim((range_xmid - range_yscale * 2, range_xmid + range_yscale * 2))
-
-
-def calcRange(points):
-    points_arr = np.array(points)
-    lon_max = points_arr[:, 0].max()
-    lon_min = points_arr[:, 0].min()
-    lat_max = points_arr[:, 1].max()
-    lat_min = points_arr[:, 1].min()
-    range_PCS = [lon_min, lon_max, lat_min, lat_max]
-
-    return range_PCS
-
-
-def checkEnv(DIR_IN, DIR_OUT, OUTPUT):
-    if not os.path.isdir(DIR_IN):
-        print('DIR <%s> not exists.' % DIR_IN)
-        sys.exit()
-
-    if OUTPUT:
-        if not os.path.isdir(DIR_OUT):
-            print('Making dir <%s>.' % DIR_OUT)
-            os.mkdir(DIR_OUT)
-        else:
-            print('Dir <%s> exists, removing old and making new empty DIR.' % DIR_OUT)
-            cmd = "rm -rf %s" % DIR_OUT
-            os.system(cmd)
-            os.mkdir(DIR_OUT)
-
-
-def saveData(points_all, points_stack, p2, p1, SAVE_TXT_POINTS, SAVE_TXT_JUNCTIONS):
-    '''
-    lat lon
-    '''
     points_all[:, 0], points_all[:, 1] = pyproj.transform(
         p2, p1, points_all[:, 0], points_all[:, 1])
     points_stack[:, 0], points_stack[:, 1] = pyproj.transform(
         p2, p1, points_stack[:, 0], points_stack[:, 1])
-    np.savetxt(SAVE_TXT_POINTS, points_all)
-    np.savetxt(SAVE_TXT_JUNCTIONS, points_stack)
+    np.savetxt(dir_points, points_all, fmt='%.8f %.8f %d')
+    np.savetxt(dir_junctions, points_stack, fmt='%.8f %.8f %d')
 
 
-def main(sourcePath, targetPath):
+def genRoad(ws_dirs):
+    print(ws_dirs)
+    config = Config(ws_dirs)
+    filepath_in = getDocPaths(config.dir_in)
 
-    print(sys.version)
-    DIR_IN = sourcePath
-    DIR_OUT = targetPath + '/app_test_out'
-    SAVE_TXT_POINTS = targetPath + '/app_test_points.txt'
-    SAVE_TXT_JUNCTIONS = targetPath + '/app_test_junctions.txt'
-    # [vel] 4.2m/s 8.4m/s
-    # {'id': 10001, 'type': 0}       0:"start_point" 1:"end_point"; 2:"way_point";
-    # {'lonlat': [10024], 'type': 3} 3:"search"; 4:"scout_start"; 5:"scout_start"
-    NODE_ATTR = {'vel': ['4.2', '8.4'], 'type': ['0', '1', '2', '-3', '4', '5', '6', '7', '-1']}
-    # [num] set (2*n+1) points around vel limited point
-    # [id] which point needs vel limit
-    SET_VEL_LIMIT = {'num': 2, 'id': []}
-    WATER = {'num': 3, 'id': []}
-    SMOKE = {'num': 3, 'id': []}
-    DYN_OB = {'num': 3, 'id': []}
-    CONCAVE_OB = {'num': 3, 'id': []}
-    OTHER_ATTR = [WATER, SMOKE, DYN_OB, CONCAVE_OB]
-
-    p1 = pyproj.Proj(init="epsg:4326")
-    p2 = pyproj.Proj(init="epsg:3857")
-    MAX = 10000
-    DIS_DELTA = 20
-    OUTPUT = True
-    INSPECT = True
-    PAUSE = 0.05
-
-    seaborn.set()
-
-    checkEnv(DIR_IN, DIR_OUT, OUTPUT)
-
-    filepath_in = findAllPath(DIR_IN)
-
-    all_seg = []
-    limit_points = []
-    water = []
-    smoke = []
-    dyn_ob = []
-    concave_ob = []
-    other_attr_points = [water, smoke, dyn_ob, concave_ob]
-
-    points_all = np.empty(shape=[0, 3])
     points_stack = np.empty(shape=[0, 3])
-    count_empty_file = 0
-    for each in filepath_in:
-        points_each_file = []
-        points_each_file, way_id, count_empty_file = parseXML(each, count_empty_file, MAX, p1, p2)
+    points_all = np.empty(shape=[0, 3])
 
-        points_each_file, points_stack = setIntersection(
-            points_each_file, points_stack, way_id, DIS_DELTA)
+    points_all_segs = get_temp_seg(filepath_in)
 
-        if len(points_each_file):
-            range_PCS = calcRange(points_each_file)
+    way_id = 10000
+    for each_seg in points_all_segs:
+        each_seg, points_stack = setIntersection(each_seg, points_stack, way_id, config.dis_delta)
+        points_all = np.vstack((points_all, each_seg))
+        writeXML(each_seg, way_id, config)
 
-            points_all = np.vstack([points_all, points_each_file])
-            all_seg.append(copy.deepcopy(points_each_file))
-            if OUTPUT:
-                limit_points, other_attr_points = writeXML(points_each_file, way_id, NODE_ATTR,
-                                                           SET_VEL_LIMIT, limit_points, OTHER_ATTR, other_attr_points, DIR_OUT, p2, p1)
+        way_id = way_id + 10000
 
-            if INSPECT:
-                plt.figure(0)
-                mng_figure0 = plt.get_current_fig_manager()
-                mng_figure0.resize(1600, 800)
-                # plt.axis("equal")
-                showAnimate(points_stack, points_all, PAUSE, range_PCS)
-
-    plt.clf()
-    plt.axis('equal')
-    plt.scatter(points_all[:, 0], points_all[:, 1], c='r', marker='.')
-    plt.scatter(points_stack[:, 0], points_stack[:, 1], c='k', marker='o')
-    plt.pause(2)
     print('Done! Set %d junction points.' % points_stack.shape[0])
 
-    if INSPECT:
-        print('Inspecting ...')
-        plt.figure(1)
-        mng_figure1 = plt.get_current_fig_manager()
-        mng_figure1.resize(1600, 800)
-        # plt.axis('equal')
-        plt.scatter(points_all[:, 0], points_all[:, 1], c='r', marker='.')
-        showInspect(points_stack, all_seg, points_all, PAUSE)
-        plt.clf()
-        plt.axis('equal')
-        plt.scatter(points_all[:, 0], points_all[:, 1], c='r', marker='.')
-        plt.scatter(points_stack[:, 0], points_stack[:, 1], c='k', marker='o')
-        plt.pause(2)
-        print('Inspect display over.')
-
-        print('Show attribute.')
-        # vel limit
-        plt.figure(2)
-        mng_figure2 = plt.get_current_fig_manager()
-        mng_figure2.window.showMaximized()
-        showAttr(points_stack, points_all, limit_points)
-
-        plt.figure(3)
-        mng_figure3 = plt.get_current_fig_manager()
-        mng_figure3.window.showMaximized()
-        # water
-        plt.subplot(2, 2, 1)
-        showAttr(points_stack, points_all, other_attr_points[0])
-        # smoke
-        plt.subplot(2, 2, 2)
-        showAttr(points_stack, points_all, other_attr_points[1])
-        # dyn_ob
-        plt.subplot(2, 2, 3)
-        showAttr(points_stack, points_all, other_attr_points[2])
-        # concave_ob
-        plt.subplot(2, 2, 4)
-        showAttr(points_stack, points_all, other_attr_points[3])
-
-    plt.show()
-
-    if OUTPUT:
-        saveData(points_all, points_stack, p2, p1, SAVE_TXT_POINTS, SAVE_TXT_JUNCTIONS)
-        print('Data <%s> and <%s> have saved.' % (SAVE_TXT_POINTS, SAVE_TXT_JUNCTIONS))
+    saveData(points_all, points_stack, config.file_points, config.file_junctions)
+    print('Data <%s> and <%s> have saved.' % (config.file_points, config.file_junctions))
 
 
-# if __name__ == '__main__':
-#
-#     main()
+if __name__ == '__main__':
+
+    print(sys.version)
+    home = os.path.expanduser('~')
+    dir_path = os.path.join(home, 'Desktop', 'Example')
+
+    ws_dir = dir_path
+    ws_dir_temp_seg = os.path.join(ws_dir, 'temp_seg')
+    ws_dir_seg = os.path.join(ws_dir, 'seg')
+    file_config = os.path.join(ws_dir, 'config.txt')
+
+    ws_dirs = [ws_dir, ws_dir_temp_seg, ws_dir_seg]
+    genRoad(ws_dirs)
