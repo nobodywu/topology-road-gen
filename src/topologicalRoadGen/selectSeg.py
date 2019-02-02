@@ -16,6 +16,7 @@ import time
 import subprocess
 import topologicalRoadGen.setJunctions as sj
 import topologicalRoadGen.showLink as sl
+import topologicalRoadGen.pathPlanning as pp
 
 
 class MakeFolder(tk.Toplevel):
@@ -41,7 +42,7 @@ class MakeFolder(tk.Toplevel):
         self.wm_attributes('-topmost', 1)
 
     def makeButtons(self):
-        tk.Button(self, text="确定", command=lambda: self.openWs(
+        tk.Button(self, text="创建/打开", command=lambda: self.openWs(
             self.dir_name.get())).pack(side=tk.BOTTOM)
 
     def destory(self):
@@ -218,6 +219,7 @@ class App(tk.Frame):
         self.viewmenu = tk.Menu(self.menubar, tearoff=False)
         self.viewmenu.add_command(label="重置视图", command=self.openFile)
         self.viewmenu.add_command(label="检查路网", command=self.inspectRoad)
+        self.viewmenu.add_command(label="最短路径", command=self.getshortestPath)
         self.menubar.add_cascade(label="视图", menu=self.viewmenu)
 
         self.helpmenu = tk.Menu(self.menubar, tearoff=False)
@@ -411,10 +413,17 @@ class App(tk.Frame):
                 self.allSeg.pop()
                 items = self.allSegItem.pop()
                 print(items)
+                allSegItemInOne = []
+                for each in self.allSegItem:
+                    allSegItemInOne.extend(each)
+
                 for item in items:
                     # 如果点以保存的暂存路段temp_seg中变为黑色，否则变为红色
                     if item in self.all_temp_seg_items:
                         self.canvas.itemconfig(item, fill='black', outline='black')
+                        self.canvas.tag_raise(item)
+                    elif item in allSegItemInOne:
+                        self.canvas.itemconfig(item, fill='green', outline='green')
                         self.canvas.tag_raise(item)
                     else:
                         self.canvas.itemconfig(item, fill='red', outline='red')
@@ -429,6 +438,18 @@ class App(tk.Frame):
                 print('remain %d, %d segments.' % (len(self.allSeg), len(self.allSegItem)))
             else:
                 tm.showinfo('提示', '没有暂存路段')
+
+    def getshortestPath(self):
+        if 'ws_dir' not in globals():
+            self.openWorkspace()
+        else:
+            file_config = os.path.join(ws_dir, 'config.txt')
+            file_points = os.path.join(ws_dir, 'points.txt')
+            file_junctions = os.path.join(ws_dir, 'junctions.txt')
+
+            ws_dirs = [ws_dir, ws_dir_temp_seg, ws_dir_seg,
+                       file_config, file_points, file_junctions]
+            pp.get_shorest_path(ws_dirs)
 
     def inspectRoad(self):
         if 'ws_dir' not in globals():
@@ -451,12 +472,12 @@ class App(tk.Frame):
 
     def helpMSG(self):
         self.helpMSG = HyperlinkMessageBox(
-            root, "操作提示", '操作步骤详见 <a href="http://www.baidu.com">Baidu </a>.')
+            self, "操作提示", '操作步骤详见 <a href="https://github.com/nobodywu/topology_road_gen">Github </a>。')
 
     def aboutMSG(self):
         print('aboutMSG')
         self.aboutMSG = HyperlinkMessageBox(
-            root, "关于", '作者：NobodyWu，个人主页 <a href="http://www.baidu.com">Baidu </a>.')
+            self, "关于", '版本：v4.0.20190120。作者：NobodyWu。')
 
     # mouse event
     def printMousePosition(self, event):
@@ -468,12 +489,20 @@ class App(tk.Frame):
         删除当前路段上的点，每次删除一个。当前焦点需要在画布上。
         '''
         self.canvas.focus_set()
+
+        allSegItemInOne = []
+        for each in self.allSegItem:
+            allSegItemInOne.extend(each)
+
         # self.canvas.focus_lastfor()
         if len(self.itemSelected):
             item = self.itemSelected.pop()
             # 如果点以保存的暂存路段temp_seg中变为黑色，否则变为红色
             if item in self.all_temp_seg_items:
                 self.canvas.itemconfig(item, fill='black', outline='black')
+                self.canvas.tag_raise(item)
+            elif item in allSegItemInOne:
+                self.canvas.itemconfig(item, fill='green', outline='green')
                 self.canvas.tag_raise(item)
             else:
                 self.canvas.itemconfig(item, fill='red', outline='red')

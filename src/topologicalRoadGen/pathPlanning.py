@@ -6,6 +6,7 @@ import xml.dom.minidom
 import matplotlib.pyplot as plt
 import numpy as np
 import networkx as nx
+import sys
 
 
 def getDocPaths(dir_name):
@@ -53,21 +54,6 @@ def parseXML(filepath):
         print("Empty file, no node.")
 
     return points
-
-
-def onclick(event):
-    global ix, iy
-    ix, iy = event.xdata, event.ydata
-    print('x = %d, y = %d' % (ix, iy))
-
-    global coords
-    coords.append((ix, iy))
-
-    if len(coords) == 2:
-        fig.canvas.mpl_disconnect(cid)
-        plt.close()
-
-    return coords
 
 
 def calcDis(point, points):
@@ -124,9 +110,22 @@ def genDict(points_all_segs):
     return roadDict
 
 
-if __name__ == '__main__':
-    dir_name = '/home/mengze/Desktop/test'
-    path_list = getDocPaths(dir_name)
+def get_shorest_path(ws_dirs):
+
+    def onclick(event):
+        global ix, iy
+        ix, iy = event.xdata, event.ydata
+        print('x = %d, y = %d' % (ix, iy))
+
+        coords.append((ix, iy))
+
+        if len(coords) == 2:
+            fig.canvas.mpl_disconnect(cid)
+            plt.close()
+
+        return coords
+
+    path_list = getDocPaths(ws_dirs[2])
     print(path_list)
     points_all_segs = []
 
@@ -134,15 +133,11 @@ if __name__ == '__main__':
         points = parseXML(path)  # converted to PCS coord
         points_all_segs.append(points)
 
-    ws_dirs = ['/home/mengze/Desktop']
-    file_points = os.path.join(ws_dirs[0], 'test_points.txt')
-    file_junctions = os.path.join(ws_dirs[0], 'test_junctions.txt')
-
     p1 = pyproj.Proj(init="epsg:4326")
     p2 = pyproj.Proj(init="epsg:3857")
 
-    points_all = np.loadtxt(file_points)
-    points_stack = np.loadtxt(file_junctions)
+    points_all = np.loadtxt(ws_dirs[4])
+    points_stack = np.loadtxt(ws_dirs[5])
     points_all[:, 0], points_all[:, 1] = pyproj.transform(
         p1, p2, points_all[:, 0], points_all[:, 1])
     points_stack[:, 0], points_stack[:, 1] = pyproj.transform(
@@ -158,6 +153,10 @@ if __name__ == '__main__':
     cid = fig.canvas.mpl_connect('button_press_event', onclick)
 
     plt.show()
+
+    if not coords:
+        print("ERROR: no points are selected")
+        sys.exit()
 
     point1 = findNearestPoint(coords[0], points_all)
     print(point1)
@@ -183,7 +182,7 @@ if __name__ == '__main__':
 
     shortestPath = nx.shortest_path(g, source=str(point1[-1]), target=str(point2[-1]))
 
-    print(shortestPath)
+    # print(shortestPath)
 
     path_array = np.empty(shape=(0, 3))
     for each in shortestPath:
@@ -191,12 +190,42 @@ if __name__ == '__main__':
         # print(points_all[index[0][0]].shape)
         path_array = np.vstack((path_array, points_all[index[0][0]]))
 
-    print(path_array)
+    # print(path_array)
 
     fig = plt.figure(2)
     ax = fig.add_subplot(111)
     ax.axis('equal')
+
     ax.scatter(points_all[:, 0], points_all[:, 1], c='r', marker='.')
+    ax.scatter(path_array[:, 0], path_array[:, 1], c="b", marker='.')
     ax.scatter(points_stack[:, 0], points_stack[:, 1], c='k', marker='o')
-    plt.plot(path_array[:, 0], path_array[:, 1], "b-", linewidth=4)
+    ax.annotate('START', xy=(point1[0], point1[1]), xycoords='data',
+                xytext=(-35, 0), textcoords='offset points',
+                size=12, ha='right', va='center',
+                bbox=dict(boxstyle='round', alpha=0.3),
+                arrowprops=dict(arrowstyle='wedge,tail_width=0.5', alpha=0.3))
+
+    ax.annotate('END', xy=(point2[0], point2[1]), xycoords='data',
+                xytext=(-35, 0), textcoords='offset points',
+                size=12, ha='right', va='center',
+                bbox=dict(boxstyle='round', alpha=0.3, ec='gray'),
+                arrowprops=dict(arrowstyle='wedge,tail_width=0.5', alpha=0.3))
     plt.show()
+
+
+if __name__ == '__main__':
+
+    print(sys.version)
+    home = os.path.expanduser('~')
+    dir_path = os.path.join(home, 'Desktop', 'Example')
+
+    ws_dir = dir_path
+    ws_dir_temp_seg = os.path.join(ws_dir, 'temp_seg')
+    ws_dir_seg = os.path.join(ws_dir, 'seg')
+    file_config = os.path.join(ws_dir, 'config.txt')
+    file_points = os.path.join(ws_dir, 'points.txt')
+    file_junctions = os.path.join(ws_dir, 'junctions.txt')
+
+    ws_dirs = [ws_dir, ws_dir_temp_seg, ws_dir_seg, file_config, file_points, file_junctions]
+
+    get_shorest_path(ws_dirs)
