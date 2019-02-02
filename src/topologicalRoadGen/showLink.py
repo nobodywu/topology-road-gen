@@ -73,7 +73,7 @@ def showInspect(points_stack, all_seg, points_all, pause):
         range_PCS = calcRange(relevant_seg)
 
         set_xylim(range_PCS)
-        plt.pause(pause)
+        # plt.pause(pause)
         plt.scatter(relevant_seg[:, 0], relevant_seg[:, 1], c='g', marker='.')
         plt.scatter(points_stack[:, 0], points_stack[:, 1], c='k', marker='o')
         plt.scatter(junction_point[0], junction_point[1], c='b', marker='o')
