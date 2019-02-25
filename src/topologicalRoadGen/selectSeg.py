@@ -14,9 +14,9 @@ import webbrowser
 import hashlib
 import time
 import subprocess
-import topologicalRoadGen.setJunctions as sj
-import topologicalRoadGen.showLink as sl
-import topologicalRoadGen.pathPlanning as pp
+import setJunctions as sj
+import showLink as sl
+import pathPlanning as pp
 
 
 class MakeFolder(tk.Toplevel):

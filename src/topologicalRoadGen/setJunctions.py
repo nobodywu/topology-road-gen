@@ -160,6 +160,13 @@ def addNode(doc, osmNode, points, p1, p2):
         pointNode.setAttribute('lat', lat)
         pointNode.setAttribute('lon', lon)
 
+        if (count == 1) | (count == len(points)):
+
+            point_tagNode = doc.createElement("tag")
+            point_tagNode.setAttribute('k', "highway")
+            point_tagNode.setAttribute('v', "traffic_signals")
+            pointNode.appendChild(point_tagNode)
+
         osmNode.appendChild(pointNode)
 
 
