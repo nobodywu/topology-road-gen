@@ -26,7 +26,7 @@ Ubuntu terminal:
 
 There is a video available on [Bilibili](https://www.bilibili.com/video/av42444813/) (a Chinese video web).
 
-- Copy `Example` directory to **desktop**
+- Copy `Example` directory to **desktop**, `Example` folder is an workspace, each workspace identify only one KML file. **Need change `config.txt`, line 4, KML file path to your own**. This is an bug.
 - Run `main.py`
 - Enter **Example** in the dialog. The workspace created by the GUI tool is on the desktop. If the workspace exists, it will open directly.
 
@@ -42,6 +42,8 @@ The interface includes a menu bar and canvas, and the menu bar contains options:
     - Init view(重置视图)
     - Inspect road network(检查路网). Read the xml file of the road segment with the intersection point in the `seg` directory, and show the connection relationship with animation.
 
+**Note**:  
+Example folder config.txt path is my home path, please change to your own.
 
 **Operation Tips**:
 - Move. **Left mouse button**, dragging canvas
