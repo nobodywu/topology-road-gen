@@ -300,9 +300,12 @@ class App(tk.Frame):
             self.config_info = self.get_config(file_config)
             self.canvas_scale = 1
 
-            # 如果config文件中有kml文件
+            # if has kml file path in config
             if self.config_info:
-                ws_kml_file = self.config_info[1].strip()
+                # only get kml file name, in case copy workspace to other user
+                kml_file = self.config_info[1].strip()
+                kml_file_name = os.path.basename(kml_file)
+                ws_kml_file = os.path.join(ws_dir, kml_file_name)
                 self.getPointsOld(ws_kml_file)
 
             else:
@@ -467,7 +470,9 @@ class App(tk.Frame):
             self.openWorkspace()
         else:
             ws_dirs = [ws_dir, ws_dir_temp_seg, ws_dir_seg]
-            sl.inspect(ws_dirs)
+
+            if os.listdir(ws_dir_seg):  # if has segments
+                sl.inspect(ws_dirs)
 
     def genTopologyRoad(self):
         if 'ws_dir' not in globals():
@@ -701,6 +706,7 @@ class App(tk.Frame):
             f.writelines(text)
 
     def get_config(self, file_config):
+        print('Read config')
         with open(file_config, 'r') as f:
             text = f.readlines()
             line3 = text[2]
@@ -709,6 +715,7 @@ class App(tk.Frame):
             kml_path = line4[8:]
 
         if config_md5 == '未打开KML文件\n' and kml_path == '未打开KML文件\n':
+            print('config don\'t has kml file info')
             config_info = []
             return config_info
         else:
