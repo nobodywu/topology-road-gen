@@ -1,53 +1,55 @@
-### Dependences
-Env: Ubuntu 16.04, Python3.6.3
+### 目录结构
+拓扑路网生成GUI工具：`genRoad.py`。路网属性添加GUI工具`addAttr.py`.路网相关的各种脚本工具在`tools`文件夹下。
 
-Dependences：
-- [tkinter](https://wiki.python.org/moin/TkInter)
-- [pykml](https://pythonhosted.org/pykml/installation.html) 
-- [numpy](http://www.numpy.org/), 1.14.2
-- [seaborn](https://seaborn.pydata.org/installing.html), 0.9.0
-- [matplotlib](https://matplotlib.org/users/installing.html), 2.2.2
-- [pyproj](https://jswhit.github.io/pyproj/)，1.9.5.1
-- [networkx](https://networkx.github.io/), 2.2
+```
+.
+├── addAttr.py
+├── doc(dir)
+├── example(dir)
+│   ├── changsha_May22(dir)
+│   ├── config_attr.xml
+│   ├── Example.kml
+│   ├── KYXZ2018A.txt
+│   └── txt2kml(dir)
+├── figure(dir)
+├── genRoad.py
+├── lib(dir)
+└── tools(dir)
+    ├── dirsRoadGen.py
+    ├── genSparseRoadpoint.py
+    ├── modifyTasks.py
+    ├── selectTaskPoints.py
+    ├── showLink.py
+    └── txt2kml.py
+```
 
-Python standard lib: os, sys, time, subprocess, hashlib, shutil, re, webbrowser, xml
+### 拓扑路网生成GUI工具
+编辑、生成、检查拓扑路网。[中文教程](./doc/generate_topology_road_zh.md)，[English Tutorial](./doc/generate_topology_road_zh.md)。
 
-Ubuntu terminal:  
-`$ sudo apt-get install wmctrl` 
+![](./figure/road_gen_small.png)
+
+### 路网属性添加GUI工具
+添加路点属性。可根据需要为为路点添加任意需要的属性和值。[中文教程](./doc/add_attribute.md)。
+
+![](./figure/add_attr_startup.png)
+
+### 路网相关脚本
+lib文件夹下为处理路网相关的脚本。
+- [从多个文件夹中读取暂存路段创建拓扑路网](./doc/dirs_generate_road.md)
+- [生成稀少路点的拓扑路网，用于终端显示](./doc/generate_sparse_road.md)
+- [在Google Earth中修改任务点](./doc/modify_tasks.md)
+- [检查拓扑路网](./doc/show_link.md)
+- [把txt文件转换为kml文件](./doc/rosbag2txt2kml.md)
+
+## 更新日记
+2019.06.12 完成了路网属性添加GUI程序
+2019.06.11 调整了界面中的文字大小，使其更易于阅读
+2019.06.08 优化了输入工作空间名称之后提示框的内容和顺序
+2019.06.05 解决了中文路径问题，程序可以自动识别系统创建和访问目录
+
+### Contributor
+Nobody Wu: [GitHub](https://github.com/nobodywu), [CSDN](https://blog.csdn.net/NobodyWu)
 
 
-**Note:** The GUI tool language is temporarily Chinese.
-
-**Trouble shot:** when import pykml in python: 
-- No module named 'urllib2'. Open file `.../python3.6/site-packages/pykml/parser.py` repalce line 8 with `from urllib.request import urlopen`
-- Module factor. Last line should be `print(write_python_script_for_kml_document(doc))`.
-
-### Usage
-
-There is a video available on [Bilibili](https://www.bilibili.com/video/av42444813/) (a Chinese video web).
-
-- Copy `Example` directory to **desktop**, `Example` folder is an workspace, each workspace identify only one KML file. **Need change `config.txt`, line 4, KML file path to your own**. This is an bug.
-- Run `main.py`
-- Enter **Example** in the dialog. The workspace created by the GUI tool is on the desktop. If the workspace exists, it will open directly.
-
-The interface includes a menu bar and canvas, and the menu bar contains options:
-- File(文件)
-    - Create/open workspace(创建/打开工作空间)
-    - Open kml file(打开kml文件). The first time you click, the file selection dialog will pop up; if there is a kml file in the workspace, the kml file will be opened directly and all saved temporary sections in the `temp_seg` directory will be displayed.
-    - Save segment selected(保存暂存路段). Save all temporary sections and generate a txt file with no intersections in the `temp_seg` directory.
-- Edit(编辑)
-    - Delete the road segment(删除路段). Delete the last temporary segment selected rather than in the `temp_seg` directory
-    - Road network generate(生成路网)。Read the txt file with no intersection point in the `temp_seg` directory, and generate the xml file with the intersection point in the `seg` directory.
-- View(视图)
-    - Init view(重置视图)
-    - Inspect road network(检查路网). Read the xml file of the road segment with the intersection point in the `seg` directory, and show the connection relationship with animation.
-
-**Note**:  
-Example folder config.txt path is my home path, please change to your own.
-
-**Operation Tips**:
-- Move. **Left mouse button**, dragging canvas
-- Zoom in and out. **Middle mouse**, rolling
-- Select a waypoint. **Left mouse button**, Right click
-- Delete waypoints. **Escape** key
-- Save selected road segments. **Enter** key
+<br>
+<p align="right"> Auther: Wu Mengze<br>Date: Jun 12 2019</p>
