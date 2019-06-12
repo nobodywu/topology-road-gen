@@ -1,9 +1,0 @@
-创建时间：Sat Jan 19 17:29:58 2019
-访问时间：Sun Jan 20 19:38:04 2019
-KML文件MD5：b5c73d127805c0b1809a38db8a5b4bde
-KML文件路径：/home/mengze/Desktop/Example/Example.kml
-
-**********************************
-拓扑路网生成UI
-作者：NobodyWu
-邮箱：mengze.bit@gmail.com
