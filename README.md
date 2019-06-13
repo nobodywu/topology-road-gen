@@ -6,9 +6,9 @@
 ├── addAttr.py
 ├── doc(dir)
 ├── example(dir)
-│   ├── changsha_May22(dir)
+│   ├── changsha_example(dir)
 │   ├── config_attr.xml
-│   ├── Example.kml
+│   ├── changsha.kml
 │   ├── KYXZ2018A.txt
 │   └── txt2kml(dir)
 ├── figure(dir)

@@ -13,12 +13,18 @@ Pyhton 标准库：os, sys, time, subprocess, hashlib, shutil, re, webbrowser, x
 - 安装系统软件 `$ sudo apt-get install wmctrl` 
 - 使用conda，安装Python依赖
     - [下载](https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh) miniconda3(python3, x64)进行安装`$ bash Miniconda3-latest-Linux-x86_64.sh`。重新打开终端会在用户名前看到 **(base)**，说明此时在conda环境中
-    - 创建一个新的conda环境，`(base)$conda create -n py36 python=3.6`。进入新的环境`(base)$ source activate py36`将会在用户名前面看到 **(py36)**。**不要** 在 **(base)** 中安装pykml，它会改变python环境，python3 --> python2
+    - 创建一个新的conda环境，`(base)$ conda create -n py36 python=3.6`。进入新的环境`(base)$ source activate py36`将会在用户名前面看到 **(py36)**。**不要** 在 **(base)** 中安装pykml，它会改变python环境，python3 --> python2
     - 在**py36**中安装依赖，`(py36)$ conda install -c conda-forge libiconv numpy tk pykml pyproj matplotlib seaborn`
     - 对pykml做一些改变:
         - 打开`~/miniconda3/envs/py36/lib/python3.6/site-packages/pykml/parser.py`第八行替换为`from urllib.request import urlopen`
         - 打开`~/miniconda3/envs/py36/lib/python3.6/site-packages/pykml/factor.py`最后一行应该为 `print(write_python_script_for_kml_document(doc))`.
-    - 启动GUI程序`(py36)$ python genRoad.py`
+
+启动GUI程序`(py36)$ python genRoad.py`
+
+**问题解答：**
+
+Q: 清华源有问题？  
+由于某些因素清华的conda镜像登不上去了，所以需要换回conda的默认源。`$ conda config --remove-key channels`
 
 Q: 如何解决conda与ROS冲突问题？  
 A: 退出conda环境`(py36)$ conda deactivate`
@@ -83,4 +89,4 @@ A: `$ conda config --set auto_activate_base false`. 重新打开终端将不会�
 
 
 <br>
-<p align="right"> Auther: Wu Mengze<br>Date: Jun 12 2019</p>
+<p align="right"> Auther: Wu Mengze<br>Date: Jun 13 2019</p>
