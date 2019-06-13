@@ -26,13 +26,13 @@ class App(tk.Frame):
         self.frameL.pack(side=tk.LEFT)
 
         self.button1 = tk.Button(self.frameL, text="输入路网", font=self.font,
-                                 command=self.openDir,).pack()
+                                 command=lambda: self.openDir(root),).pack()
         self.button2 = tk.Button(self.frameL, text="输入属性", font=self.font,
                                  command=self.openConfig).pack()
         self.button3 = tk.Button(self.frameL, text="输出路网", font=self.font,
                                  command=lambda: self.genRoadAttr(self.inputWsDir, self.config)).pack()
         self.button3 = tk.Button(self.frameL, text="退出程序", font=self.font,
-                                 command=self.exit).pack()
+                                 command=lambda: self.exit(root)).pack()
 
         # right
 
@@ -62,7 +62,7 @@ class App(tk.Frame):
         self.inputWsDir = ''
         self.config = ''
 
-    def openDir(self):
+    def openDir(self, root):
         desktopPath = getSysDesktop()
 
         while True:
@@ -136,7 +136,7 @@ class App(tk.Frame):
                 self.tex.insert(tk.END, text)
                 self.tex.see(tk.END)
 
-    def exit(self):
+    def exit(self, root):
         root.destroy()
 
         # root.after(2000, root.destroy)
