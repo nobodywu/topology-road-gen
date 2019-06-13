@@ -29,10 +29,10 @@ A: `$ conda config --set auto_activate_base false`. 重新打开终端将不会�
 ### 使用说明
 操作视频请见[链接](https://www.bilibili.com/video/av42444813)。
 
-**添加路段到拓扑路网之前请保证kml文件包含了所有路径**。一个kml文件对应一个工作空间，如果想添加的路段在kml文件中不存在，则需要完善kml文件上的路径，打开新的工作空间，重新选择所有路段。或者[从多个文件夹中读取暂存路段创建新的路网](./doc/dirs_generate_road.md)
+**添加路段到拓扑路网之前请保证kml文件包含了所有路径**。一个kml文件对应一个工作空间，如果想添加的路段在kml文件中不存在，则需要完善kml文件上的路径，打开新的工作空间，重新选择所有路段。或者[从多个文件夹中读取暂存路段创建新的路网](./dirs_generate_road.md)
 
 1. 生成拓扑路网
-    - 准备kml文件。[实车采集转换为kml文件](./doc/rosbag2txt2kml.md)后在Google Earth修改或直接在Google Earth勾画需要的路线。[创建和编辑path教程](./doc/creat_and_edit_path.md)。输出为kml文件，如示例文件`cahngsha_May20.kml`。如何Google Earth中处理路口处的路径请[参考这里](./doc/draw_intersection.md)
+    - 准备kml文件。[实车采集转换为kml文件](./rosbag2txt2kml.md)后在Google Earth修改或直接在Google Earth勾画需要的路线。[创建和编辑path教程](./creat_and_edit_path.md)。输出为kml文件，如示例文件`cahngsha_May20.kml`。如何Google Earth中处理路口处的路径请[参考这里](./draw_intersection.md)
     - 运行`(py36)$ python genRoad.py`，打开主界面，输入工作空间名称，创建的工作空间位于**桌面**，程序自动判断中英文路径
     - 点击菜单栏**文件** --> **打开kml文件**，选择第一步准备的kml文件。
     - 利用鼠标右键按顺序点击完成路段的选择，按回车键暂存选择的路段，端点提示范围框为8m，建议路段中点间距为5-20m。
