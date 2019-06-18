@@ -27,9 +27,9 @@ class App(tk.Frame):
         self.frameL.pack(side=tk.LEFT)
 
         self.button1 = tk.Button(self.frameL, text="输入路网", font=self.font,
-                                 command=lambda: self.openDir(root)).pack()
+                                 command=self.openDir).pack()
         self.button2 = tk.Button(self.frameL, text="输入属性", font=self.font,
-                                 command=lambda: self.openConfig(root)).pack()
+                                 command=self.openConfig).pack()
         self.button3 = tk.Button(self.frameL, text="输出路网", font=self.font,
                                  command=lambda: self.genRoadAttr(self.inputWsDir, self.config)).pack()
         self.button3 = tk.Button(self.frameL, text="退出程序", font=self.font,
@@ -63,10 +63,11 @@ class App(tk.Frame):
         self.inputWsDir = ''
         self.config = ''
 
-    def openDir(self, root):
+    def openDir(self):
         desktopPath = getSysDesktop()
         try:
-            inputWsDir = tkFile.askdirectory(initialdir=desktopPath, parent=root)
+            inputWsDir = ''
+            inputWsDir = tkFile.askdirectory(initialdir=desktopPath)
         except:
             sys.exit()
 
@@ -85,10 +86,11 @@ class App(tk.Frame):
                 self.tex.insert(tk.END, text)
                 self.tex.see(tk.END)             # Scroll if necessary
 
-    def openConfig(self, root):
+    def openConfig(self):
         desktopPath = getSysDesktop()
         try:
-            configFile = tkFile.askopenfilename(initialdir=desktopPath, parent=root,
+            configFile = ''
+            configFile = tkFile.askopenfilename(initialdir=desktopPath,
                                                 filetypes=[("XML Files", ".xml"), ('All files', '*')])
         except:
             sys.exit()
