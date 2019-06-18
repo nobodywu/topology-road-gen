@@ -9,6 +9,7 @@ import locale
 import subprocess
 import xml.etree.ElementTree as et
 import lib.checkAttr as ca
+import sys
 
 
 class App(tk.Frame):
@@ -26,9 +27,9 @@ class App(tk.Frame):
         self.frameL.pack(side=tk.LEFT)
 
         self.button1 = tk.Button(self.frameL, text="输入路网", font=self.font,
-                                 command=lambda: self.openDir(root),).pack()
+                                 command=lambda: self.openDir(root)).pack()
         self.button2 = tk.Button(self.frameL, text="输入属性", font=self.font,
-                                 command=self.openConfig).pack()
+                                 command=lambda: self.openConfig(root)).pack()
         self.button3 = tk.Button(self.frameL, text="输出路网", font=self.font,
                                  command=lambda: self.genRoadAttr(self.inputWsDir, self.config)).pack()
         self.button3 = tk.Button(self.frameL, text="退出程序", font=self.font,
@@ -64,54 +65,55 @@ class App(tk.Frame):
 
     def openDir(self, root):
         desktopPath = getSysDesktop()
-
-        while True:
+        try:
             inputWsDir = tkFile.askdirectory(initialdir=desktopPath, parent=root)
+        except:
+            sys.exit()
 
-            if inputWsDir:
+        if inputWsDir:
+            segDir = os.path.join(inputWsDir, 'seg')
+            pointsFile = os.path.join(inputWsDir, 'points.txt')
+
+            if os.path.isfile(pointsFile) and os.path.isdir(segDir):
                 self.inputWsDir = inputWsDir
-                segDir = os.path.join(inputWsDir, 'seg')
-                pointsFile = os.path.join(inputWsDir, 'points.txt')
+                text = '[INPUT]\n输入文件夹：%s\n' % self.inputWsDir
+                self.tex.insert(tk.END, text)
+                self.tex.see(tk.END)
 
-                if os.path.isdir(segDir) and os.path.isfile(pointsFile):
-                    break
+            else:
+                text = '[ERROR]\n%s不是工作空间，请重新选取\n' % self.inputWsDir
+                self.tex.insert(tk.END, text)
+                self.tex.see(tk.END)             # Scroll if necessary
 
-            text = '[ERROR]\n%s不是工作空间，请重新选取\n' % self.inputWsDir
-            self.tex.insert(tk.END, text)
-            self.tex.see(tk.END)             # Scroll if necessary
-
-        text = '[INPUT]\n输入文件夹：%s\n' % self.inputWsDir
-        self.tex.insert(tk.END, text)
-        self.tex.see(tk.END)
-
-    def openConfig(self):
+    def openConfig(self, root):
         desktopPath = getSysDesktop()
-
-        while True:
-            configFile = tkFile.askopenfilename(initialdir=desktopPath,
+        try:
+            configFile = tkFile.askopenfilename(initialdir=desktopPath, parent=root,
                                                 filetypes=[("XML Files", ".xml"), ('All files', '*')])
-            if configFile:
-                self.config = configFile
+        except:
+            sys.exit()
 
-                try:
-                    tree = et.parse(self.config)
-                    root = tree.getroot()
-                except:
-                    text = '[ERROR]\n%s不是有效的xml文件，请重新选取\n' % self.config
-                    self.tex.insert(tk.END, text)
-                    self.tex.see(tk.END)
-                    continue
+        if configFile:
+            self.config = configFile
+            try:
+                tree = et.parse(self.config)
+                root = tree.getroot()
 
                 if root.tag == 'attr':
-                    break
+                    text = '[INPUT]\n属性配置文件：%s\n' % self.config
+                    self.tex.insert(tk.END, text)
+                    self.tex.see(tk.END)
                 else:
-                    text = '[ERROR]\n%s不是路网属性xml文件，请重新选取\n' % self.config
+                    self.config = ''
+                    text = '[ERROR]\n%s不是路网属性xml文件，请检查根节点\n' % self.config
                     self.tex.insert(tk.END, text)
                     self.tex.see(tk.END)
 
-        text = '[INPUT]\n属性配置文件：%s\n' % self.config
-        self.tex.insert(tk.END, text)
-        self.tex.see(tk.END)
+            except:
+                self.config = ''
+                text = '[ERROR]\n%s不是有效的xml文件，请重新选取\n' % self.config
+                self.tex.insert(tk.END, text)
+                self.tex.see(tk.END)
 
     def genRoadAttr(self, inputWsDir, configFile):
 
