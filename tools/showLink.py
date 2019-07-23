@@ -35,6 +35,7 @@ def getDocPaths(dir_name):
 
 def parseXML(filepath):
     # 读取具有连接关系路段中的点并进行坐标转换，转换到投影坐标系中
+    print('Wait for parsing XML ...')
     p1 = pyproj.Proj(init="epsg:4326")
     p2 = pyproj.Proj(init="epsg:3857")
 
@@ -51,6 +52,7 @@ def parseXML(filepath):
             point = [float(lon), float(lat), int(point_id)]
             point[0], point[1] = pyproj.transform(p1, p2, point[0], point[1])
             points.append(point)
+        print('Nodes loop done')
 
     else:
         print("Empty file, no node.")
@@ -167,7 +169,7 @@ if __name__ == '__main__':
     print(sys.version)
     home = os.path.expanduser('~')
 
-    desktop_ws = os.path.join(home, 'Desktop', 'changsha_May22')
+    desktop_ws = os.path.join(home, 'Desktop', 'Alxa_July01')
 
     input_seg = os.path.join(desktop_ws, 'seg')
 
