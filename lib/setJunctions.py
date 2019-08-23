@@ -211,11 +211,11 @@ def genRoad(ws_dirs):
     points_stack = np.empty(shape=[0, 3])
     points_all = np.empty(shape=[0, 3])
 
+    print('Wait for reading temp seg ...')
     points_all_segs = get_temp_seg(filepath_in)
 
     way_id = 10000
     for each_seg in points_all_segs:
-        print('Wait for writing XML ...')
         each_seg, points_stack = setIntersection(each_seg, points_stack, way_id, config.dis_delta)
         points_all = np.vstack((points_all, each_seg))
         writeXML(each_seg, way_id, config)
