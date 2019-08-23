@@ -17,7 +17,7 @@ Pyhton 标准库：os, sys, time, subprocess, hashlib, shutil, re, webbrowser, x
     - 在**py36**中安装依赖，`(py36)$ conda install -c conda-forge libiconv numpy tk pykml pyproj matplotlib seaborn`
     - 对pykml做一些改变:
         - 打开`~/miniconda3/envs/py36/lib/python3.6/site-packages/pykml/parser.py`第八行替换为`from urllib.request import urlopen`
-        - 打开`~/miniconda3/envs/py36/lib/python3.6/site-packages/pykml/factor.py`最后一行应该为 `print(write_python_script_for_kml_document(doc))`.
+        - 打开`~/miniconda3/envs/py36/lib/python3.6/site-packages/pykml/factory.py`最后一行应该为 `print(write_python_script_for_kml_document(doc))`.
 
 启动GUI程序`(py36)$ python genRoad.py`
 
