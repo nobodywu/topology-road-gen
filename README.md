@@ -26,8 +26,10 @@
 ### 拓扑路网生成GUI工具
 编辑、生成、检查拓扑路网。[中文教程](./doc/generate_topology_road_zh.md)，[English Tutorial](./doc/generate_topology_road_zh.md)。
 
-Related Publication:  
-Mengze Wu, Hui Jin, Bo Tang, Lei Yang, Tian Yang and Jianwei Gong. Constructing Topological Road Network of Wild Environment using Google Earth Pro. 2019 IEEE Intelligent Transportation Systems Conference (ITSC), Accepted.
+**Related Publication**:  
+Mengze Wu, Hui Jin, Bo Tang, Lei Yang, Tian Yang and Jianwei Gong. Constructing Topological Road Network of Wild Environment using Google Earth Pro[C]. 2019 IEEE Intelligent Transportation Systems Conference (ITSC). IEEE, 2019: 2095-2100. DOI: [10.1109/ITSC.2019.8917090](https://ieeexplore.ieee.org/document/8917090). [PDF](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8917090)
+
+实现过程可参考上述论文。
 
 ![](./figure/road_gen_small.png)
 
