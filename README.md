@@ -51,6 +51,7 @@ lib文件夹下为处理路网相关的脚本。
 2019.06.11 调整了界面中的文字大小，使其更易于阅读  
 2019.06.08 优化了输入工作空间名称之后提示框的内容和顺序  
 2019.06.05 解决了中文路径问题，程序可以自动识别系统创建和访问目录
+2020.01.03 论文发表，添加论文连接
 
 ### Contributor
 Nobody Wu: [GitHub](https://github.com/nobodywu), [CSDN](https://blog.csdn.net/NobodyWu)
