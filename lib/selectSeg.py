@@ -762,8 +762,13 @@ def projPoints(pointsGPS):
     '''
     pointsGPS = np.array(pointsGPS)
 
-    p1 = pyproj.Proj(init="epsg:4326")
-    p2 = pyproj.Proj(init="epsg:3857")
+    # EPSG website: http://epsg.io/
+    # p1 = pyproj.Proj(init="epsg:4326")
+    # p2 = pyproj.Proj(init="epsg:3857")
+
+    # WGS_1984 to UTM_Zone_50N
+    p1 = pyproj.Proj(proj='latlong',datum='WGS84')
+    p2 = pyproj.Proj(proj="utm",zone=50,datum='WGS84')
     pointsGPS[:, 0], pointsGPS[:, 1], pointsGPS[:, 2] = pyproj.transform(
         p1, p2, pointsGPS[:, 0], pointsGPS[:, 1], pointsGPS[:, 2])
 
