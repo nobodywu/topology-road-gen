@@ -472,6 +472,7 @@ class App(tk.Frame):
                 tm.showinfo('提示', '没有暂存路段')
 
     def inspectRoad(self):
+        print('Reading files ...')
         if 'ws_dir' not in globals():
             self.openWorkspace()
         else:

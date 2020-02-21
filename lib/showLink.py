@@ -35,8 +35,13 @@ def getDocPaths(dir_name):
 
 def parseXML(filepath):
     # 读取具有连接关系路段中的点并进行坐标转换，转换到投影坐标系中
-    p1 = pyproj.Proj(init="epsg:4326")
-    p2 = pyproj.Proj(init="epsg:3857")
+    # EPSG website: http://epsg.io/
+    # p1 = pyproj.Proj(init="epsg:4326")
+    # p2 = pyproj.Proj(init="epsg:3857")
+
+    # WGS_1984 to UTM_Zone_50N
+    p1 = pyproj.Proj(proj='latlong',datum='WGS84')
+    p2 = pyproj.Proj(proj="utm",zone=50,datum='WGS84')
 
     points = []
     DOMTree = xml.dom.minidom.parse(filepath)
@@ -124,8 +129,13 @@ def calcRange(points):
 
 def inspect(ws_dirs):
 
-    p1 = pyproj.Proj(init="epsg:4326")
-    p2 = pyproj.Proj(init="epsg:3857")
+    # EPSG website: http://epsg.io/
+    # p1 = pyproj.Proj(init="epsg:4326")
+    # p2 = pyproj.Proj(init="epsg:3857")
+
+    # WGS_1984 to UTM_Zone_50N
+    p1 = pyproj.Proj(proj='latlong',datum='WGS84')
+    p2 = pyproj.Proj(proj="utm",zone=50,datum='WGS84')
 
     seaborn.set()
     filepath_in = getDocPaths(ws_dirs[2])  # dir_out
