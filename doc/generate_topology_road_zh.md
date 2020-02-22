@@ -2,7 +2,7 @@
 环境：Ubuntu 16.04, Python3.6
 
 Python 第三方库：[tkinter](https://wiki.python.org/moin/TkInter)
-, [pykml](https://pythonhosted.org/pykml/installation.html), [numpy](http://www.numpy.org/), [seaborn](https://seaborn.pydata.org/installing.html),, [matplotlib](https://matplotlib.org/users/installing.html), [pyproj](https://jswhit.github.io/pyproj/)， [networkx](https://networkx.github.io/)
+, [pykml](https://pythonhosted.org/pykml/installation.html), [numpy](http://www.numpy.org/), [seaborn](https://seaborn.pydata.org/installing.html),, [matplotlib](https://matplotlib.org/users/installing.html), [pyproj](https://jswhit.github.io/pyproj/), [networkx](https://networkx.github.io/)
 
 Pyhton 标准库：os, sys, time, subprocess, hashlib, shutil, re, webbrowser, xml等等
 

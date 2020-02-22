@@ -2,7 +2,7 @@
 Env: Ubuntu 16.04, Python3.6
 
 Python third part libs: [tkinter](https://wiki.python.org/moin/TkInter)
-, [pykml](https://pythonhosted.org/pykml/installation.html), [numpy](http://www.numpy.org/), [seaborn](https://seaborn.pydata.org/installing.html),, [matplotlib](https://matplotlib.org/users/installing.html), [pyproj](https://jswhit.github.io/pyproj/)， [networkx](https://networkx.github.io/)
+, [pykml](https://pythonhosted.org/pykml/installation.html), [numpy](http://www.numpy.org/), [seaborn](https://seaborn.pydata.org/installing.html),, [matplotlib](https://matplotlib.org/users/installing.html), [pyproj](https://jswhit.github.io/pyproj/), [networkx](https://networkx.github.io/)
 
 Python standard libs: os, sys, time, subprocess, hashlib, shutil, re, webbrowser, xml, etc...
 
