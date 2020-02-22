@@ -2,7 +2,7 @@
 Env: Ubuntu 16.04, Python3.6
 
 Python third part libs: [tkinter](https://wiki.python.org/moin/TkInter)
-, [pykml](https://pythonhosted.org/pykml/installation.html), [numpy](http://www.numpy.org/), [seaborn](https://seaborn.pydata.org/installing.html),, [matplotlib](https://matplotlib.org/users/installing.html), [pyproj](https://jswhit.github.io/pyproj/)
+, [pykml](https://pythonhosted.org/pykml/installation.html), [numpy](http://www.numpy.org/), [seaborn](https://seaborn.pydata.org/installing.html),, [matplotlib](https://matplotlib.org/users/installing.html), [pyproj](https://jswhit.github.io/pyproj/)， [networkx](https://networkx.github.io/)
 
 Python standard libs: os, sys, time, subprocess, hashlib, shutil, re, webbrowser, xml, etc...
 
@@ -15,6 +15,7 @@ We use conda manage python libraries.
     - [Download](https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh) miniconda3(python3, x64) and install,`$ bash Miniconda3-latest-Linux-x86_64.sh`. Re-open terminal, you will see **(base)** before username.
     - Creat a new environment,`(base)$conda create -n py36 python=3.6`. Enter new environment, `(base)$ source activate py36`, now you will see **(py36)** before username. **Do not** install pykml in **(base)**, it will change python3 --> python2
     - Install python dependences, `(py36)$ conda install -c conda-forge libiconv numpy tk pykml pyproj matplotlib seaborn`
+    - Install python dependences for path planning, `(py36)$ conda install -c anaconda networkx`
     - Do small surgery, because pykml only support python2:
         - File `~/miniconda3/envs/py36/lib/python3.6/site-packages/pykml/parser.py`, repalce line 8 with `from urllib.request import urlopen`
         - File `~/miniconda3/envs/py36/lib/python3.6/site-packages/pykml/factor.py`, the last line should be `print(write_python_script_for_kml_document(doc))`.
@@ -45,6 +46,7 @@ The interface includes a menu bar and canvas, and the menu bar contains options:
 - View(视图)
     - Init view(重置视图)
     - Inspect road network(检查路网). Read the xml file of the road segment with the intersection point in the `seg` directory, and show the connection relationship with animation.
+    - Shortest Path(最短路径). Get the shortest path by specifying the start and end points with the mouse left click.
 
 **Operation Tips**:
 - Move. **Left mouse button**, dragging canvas
@@ -54,4 +56,4 @@ The interface includes a menu bar and canvas, and the menu bar contains options:
 - Save selected road segments. **Enter** key
 
 <br>
-<p align="right"> Auther: Wu Mengze<br>Date: Jun 12 2019</p>
+<p align="right"> Auther: Wu Mengze<br>Date: Feb 22 2020</p>

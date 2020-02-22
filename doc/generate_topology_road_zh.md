@@ -2,7 +2,7 @@
 环境：Ubuntu 16.04, Python3.6
 
 Python 第三方库：[tkinter](https://wiki.python.org/moin/TkInter)
-, [pykml](https://pythonhosted.org/pykml/installation.html), [numpy](http://www.numpy.org/), [seaborn](https://seaborn.pydata.org/installing.html),, [matplotlib](https://matplotlib.org/users/installing.html), [pyproj](https://jswhit.github.io/pyproj/)
+, [pykml](https://pythonhosted.org/pykml/installation.html), [numpy](http://www.numpy.org/), [seaborn](https://seaborn.pydata.org/installing.html),, [matplotlib](https://matplotlib.org/users/installing.html), [pyproj](https://jswhit.github.io/pyproj/)， [networkx](https://networkx.github.io/)
 
 Pyhton 标准库：os, sys, time, subprocess, hashlib, shutil, re, webbrowser, xml等等
 
@@ -15,6 +15,7 @@ Pyhton 标准库：os, sys, time, subprocess, hashlib, shutil, re, webbrowser, x
     - [下载](https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh) miniconda3(python3, x64)进行安装`$ bash Miniconda3-latest-Linux-x86_64.sh`。重新打开终端会在用户名前看到 **(base)**，说明此时在conda环境中
     - 创建一个新的conda环境，`(base)$ conda create -n py36 python=3.6`。进入新的环境`(base)$ source activate py36`将会在用户名前面看到 **(py36)**。**不要** 在 **(base)** 中安装pykml，它会改变python环境，python3 --> python2
     - 在**py36**中安装依赖，`(py36)$ conda install -c conda-forge libiconv numpy tk pykml pyproj matplotlib seaborn`
+    - 在**py36**中安装用于路径规划的第三方库 `(py36)$ conda install -c anaconda networkx`
     - 对pykml做一些改变:
         - 打开`~/miniconda3/envs/py36/lib/python3.6/site-packages/pykml/parser.py`第八行替换为`from urllib.request import urlopen`
         - 打开`~/miniconda3/envs/py36/lib/python3.6/site-packages/pykml/factory.py`最后一行应该为 `print(write_python_script_for_kml_document(doc))`.
@@ -75,6 +76,7 @@ A: `$ conda config --set auto_activate_base false`. 重新打开终端将不会�
 - **视图**
     - **重置视图**。重置默认位置和比例
     - **检查路网**。运行路段连接关系检查程序，读取`seg`目录下带有路口点的路段xml文件，用动画展示连接关系。
+    - **最短路径**。通过鼠标左键点击指定起点和终点得到最短路径
 - 帮助（未完善）
     - 操作提示
     - 关于
@@ -89,4 +91,4 @@ A: `$ conda config --set auto_activate_base false`. 重新打开终端将不会�
 
 
 <br>
-<p align="right"> Auther: Wu Mengze<br>Date: Jun 13 2019</p>
+<p align="right"> Auther: Wu Mengze<br>Date: Feb 22 2020</p>
