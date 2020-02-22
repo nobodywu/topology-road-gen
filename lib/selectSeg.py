@@ -18,6 +18,7 @@ import locale
 import tkinter.font as tkFont
 import lib.setJunctions as sj
 import lib.showLink as sl
+import lib.pathPlanning as pp
 
 
 class MakeFolder(tk.Toplevel):
@@ -235,6 +236,7 @@ class App(tk.Frame):
         self.viewmenu = tk.Menu(self.menubar, tearoff=False)
         self.viewmenu.add_command(label="重置视图", font=self.font, command=self.openFile)
         self.viewmenu.add_command(label="检查路网", font=self.font, command=self.inspectRoad)
+        self.viewmenu.add_command(label="最短路径", font=self.font, command=self.getshortestPath)
         self.menubar.add_cascade(label="视图", font=self.font, menu=self.viewmenu)
 
         self.helpmenu = tk.Menu(self.menubar, tearoff=False)
@@ -470,6 +472,18 @@ class App(tk.Frame):
                 print('remain %d, %d segments.' % (len(self.allSeg), len(self.allSegItem)))
             else:
                 tm.showinfo('提示', '没有暂存路段')
+
+    def getshortestPath(self):
+        if 'ws_dir' not in globals():
+            self.openWorkspace()
+        else:
+            file_config = os.path.join(ws_dir, 'config.txt')
+            file_points = os.path.join(ws_dir, 'points.txt')
+            file_junctions = os.path.join(ws_dir, 'junctions.txt')
+
+            ws_dirs = [ws_dir, ws_dir_temp_seg, ws_dir_seg,
+                       file_config, file_points, file_junctions]
+            pp.get_shorest_path(ws_dirs)
 
     def inspectRoad(self):
         print('Reading files ...')
