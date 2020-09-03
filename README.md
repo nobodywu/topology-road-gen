@@ -56,7 +56,3 @@ lib文件夹下为处理路网相关的脚本。
 
 ### Contributor
 Nobody Wu: [GitHub](https://github.com/nobodywu), [CSDN](https://blog.csdn.net/NobodyWu)
-
-
-<br>
-<p align="right"> Auther: Wu Mengze<br>Date: Feb 22 2020</p>
