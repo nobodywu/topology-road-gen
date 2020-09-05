@@ -8,6 +8,3 @@
 - 在配置好的环境中运行`(py36)$ python showLink.py`
 
 ![](../figure/inspect.png)
-
-<br>
-<p align="right"> Auther: Wu Mengze<br>Date: Jun 12 2019</p>
