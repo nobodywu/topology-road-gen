@@ -27,5 +27,3 @@ A: 捕获距离是判断路段连接关系是使用的距离，路段长度需�
 - 修改捕获距离。`lib/setJunctions.py`中Config类的self.dis_delta变量，单位m
 - 例如：self.radius = 8, self.dis_delta =8.1。
 
-<br>
-<p align="right"> Auther: Wu Mengze<br>Date: Jun 12 2019</p>
