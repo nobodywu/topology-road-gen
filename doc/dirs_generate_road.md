@@ -20,6 +20,3 @@
 - 在第一步建立的工作空间文件夹中新建`points.txt`空文件
 - 路网属性添加GUI工具`(py36)$ python genRoad.py`
 
-
-<br>
-<p align="right"> Auther: Wu Mengze<br>Date: Jun 13 2019</p>
