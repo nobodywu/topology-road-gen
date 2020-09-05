@@ -30,7 +30,7 @@ A: 退出conda环境`(py36)$ conda deactivate`
 Q: [如何在打开终端时不默认进入conda环境](https://stackoverflow.com/questions/54429210/how-do-i-prevent-conda-from-activating-the-base-environment-by-default)  
 A: `$ conda config --set auto_activate_base false`. 重新打开终端将不会看到 **(base)**。进入conda环境`$ conda activate py36`，注意**不是 source**. 
 
-Q: python3环境安装了python2版本的pykml
+Q: python3环境安装了python2版本的pykml  
 A: 需要对pykml做一些改变:
 - 打开`~/miniconda3/envs/py36/lib/python3.6/site-packages/pykml/parser.py`第八行替换为`from urllib.request import urlopen`
 - 打开`~/miniconda3/envs/py36/lib/python3.6/site-packages/pykml/factory.py`最后一行应该为 `print(write_python_script_for_kml_document(doc))`.
