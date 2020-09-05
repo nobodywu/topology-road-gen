@@ -16,16 +16,17 @@ We use conda manage python libraries.
     - Creat a new environment,`(base)$conda create -n py36 python=3.6`. Enter new environment, `(base)$ source activate py36`, now you will see **(py36)** before username. **Do not** install pykml in **(base)**, it will change python3 --> python2
     - Install python dependences, `(py36)$ conda install -c conda-forge libiconv numpy tk pykml pyproj matplotlib seaborn`
     - Install python dependences for path planning, `(py36)$ conda install -c anaconda networkx`
-    - Do small surgery, because pykml only support python2:
-        - File `~/miniconda3/envs/py36/lib/python3.6/site-packages/pykml/parser.py`, repalce line 8 with `from urllib.request import urlopen`
-        - File `~/miniconda3/envs/py36/lib/python3.6/site-packages/pykml/factor.py`, the last line should be `print(write_python_script_for_kml_document(doc))`.
-    - Launch GUI, `(py36)$ python genRoad.py`
+
+Finally, launch GUI: `(py36)$ python genRoad.py`.
 
 Q: How to deactivate conda?  
 A: `(py36)$ conda deactivate`
 
 Q: [How do I prevent Conda from activating the base environment by default?](https://stackoverflow.com/questions/54429210/how-do-i-prevent-conda-from-activating-the-base-environment-by-default)  
 A: `$ conda config --set auto_activate_base false`.  Re-open terminal, you won't see **(base)** before username. Use `$ conda activate py36` enter conda environment, **not source**. 
+
+Q: Lib pykml only supports python2?  
+A: pykml supports python3 now.
 
 ### Usage
 
