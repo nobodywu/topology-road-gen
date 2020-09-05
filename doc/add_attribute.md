@@ -25,6 +25,3 @@
 - 三级节点的`value`值可以任意指定，将按照`text`指定的路段或路点进行属性添加。
 
 将工作空间下的points.txt导入Google Earth，查看需要设置属性的路段和路点id号。例如路点id: 210004属于路段id: 210000。
-
-<br>
-<p align="right"> Auther: Wu Mengze<br>Date: Jun 13 2019</p>
