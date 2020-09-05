@@ -30,6 +30,3 @@ When the dialog box appears the vertices of the path will appear in the 3D brows
 
 - To Add a Vertex – Select a vertex (see above) in at the segment of the path to add vertices to, and click in the 3D browser. If no vertex is selected, clicking in the 3D browser will add vertices to the end of the path.
 
-
-<br>
-<p align="right"> Auther: Wu Mengze<br>Date: Jun 11 2019</p>
