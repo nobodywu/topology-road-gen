@@ -15,5 +15,3 @@
 **注意**：  
 如果使用其他来源的txt文件，**请注意格式**。
 
-<br>
-<p align="right"> Auther: Wu Mengze<br>Date: Jun 12 2019</p>
