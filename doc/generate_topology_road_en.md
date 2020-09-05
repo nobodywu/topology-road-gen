@@ -56,5 +56,3 @@ The interface includes a menu bar and canvas, and the menu bar contains options:
 - Delete waypoints. **Escape** key
 - Save selected road segments. **Enter** key
 
-<br>
-<p align="right"> Auther: Wu Mengze<br>Date: Feb 22 2020</p>
