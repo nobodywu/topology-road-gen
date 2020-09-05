@@ -10,6 +10,3 @@
 
 生成的稀疏路点路网放在终端route文件夹下。
 
-
-<br>
-<p align="right"> Auther: Wu Mengze<br>Date: Jun 12 2019</p>
