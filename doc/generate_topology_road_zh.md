@@ -16,9 +16,6 @@ Pyhton 标准库：os, sys, time, subprocess, hashlib, shutil, re, webbrowser, x
     - 创建一个新的conda环境，`(base)$ conda create -n py36 python=3.6`。进入新的环境`(base)$ source activate py36`将会在用户名前面看到 **(py36)**。**不要** 在 **(base)** 中安装pykml，它会改变python环境，python3 --> python2
     - 在**py36**中安装依赖，`(py36)$ conda install -c conda-forge libiconv numpy tk pykml pyproj matplotlib seaborn`
     - 在**py36**中安装用于路径规划的第三方库 `(py36)$ conda install -c anaconda networkx`
-    - 对pykml做一些改变:
-        - 打开`~/miniconda3/envs/py36/lib/python3.6/site-packages/pykml/parser.py`第八行替换为`from urllib.request import urlopen`
-        - 打开`~/miniconda3/envs/py36/lib/python3.6/site-packages/pykml/factory.py`最后一行应该为 `print(write_python_script_for_kml_document(doc))`.
 
 启动GUI程序`(py36)$ python genRoad.py`
 
@@ -32,6 +29,11 @@ A: 退出conda环境`(py36)$ conda deactivate`
 
 Q: [如何在打开终端时不默认进入conda环境](https://stackoverflow.com/questions/54429210/how-do-i-prevent-conda-from-activating-the-base-environment-by-default)  
 A: `$ conda config --set auto_activate_base false`. 重新打开终端将不会看到 **(base)**。进入conda环境`$ conda activate py36`，注意**不是 source**. 
+
+Q: python3环境安装了python2版本的pykml
+A: 需要对pykml做一些改变:
+- 打开`~/miniconda3/envs/py36/lib/python3.6/site-packages/pykml/parser.py`第八行替换为`from urllib.request import urlopen`
+- 打开`~/miniconda3/envs/py36/lib/python3.6/site-packages/pykml/factory.py`最后一行应该为 `print(write_python_script_for_kml_document(doc))`.
 
 ### 使用说明
 操作视频请见[链接](https://www.bilibili.com/video/av42444813)。
