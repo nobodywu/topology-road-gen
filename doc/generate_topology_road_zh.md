@@ -92,5 +92,3 @@ A: pykml现在支持python3了。以前不支持时需要对pykml做这些改变
 - 暂存路段，保存选择好的路段。Enter键
 
 
-<br>
-<p align="right"> Auther: Wu Mengze<br>Date: Feb 22 2020</p>
