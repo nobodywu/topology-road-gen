@@ -51,7 +51,3 @@ type类型说明:
 在terminal中输入 `kill $(ps -A | grep earth |awk '{print $1}')` ，不需要终止python程序的运行。
 
 **提醒**：每次程序运行都会强制杀掉 google earth pro  ，并且删除目录下存在旧的 1.kml  文件。
-
- 
-<br>
-<p align="right"> Auther: Wu Mengze<br>Date: Jun 12 2018</p>
